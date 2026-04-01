@@ -1,0 +1,45 @@
+name: Build Backend
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'BiblioBack/**'
+      - '.github/workflows/build-back.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'BiblioBack/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: ['17']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: |
+          cd BiblioBack
+          chmod +x ./mvnw
+          ./mvnw clean package -B
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build-artifacts
+          path: |
+            BiblioBack/target/
+            !BiblioBack/target/**/*.jar

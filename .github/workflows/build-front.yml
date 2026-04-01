@@ -1,0 +1,47 @@
+name: Build Frontend
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'BiblioFront/**'
+      - '.github/workflows/build-front.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'BiblioFront/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['20.x', '22.x']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: BiblioFront/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd BiblioFront
+          npm ci
+
+      - name: Build
+        run: |
+          cd BiblioFront
+          npm run build
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-artifacts-node-${{ matrix.node-version }}
+          path: BiblioFront/dist/
