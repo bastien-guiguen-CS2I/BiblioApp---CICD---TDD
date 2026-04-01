@@ -29,17 +29,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
+      - name: Run tests
         run: |
           cd BiblioBack
           chmod +x ./mvnw
-          ./mvnw clean package -B
-
-      - name: Upload build artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build-artifacts
-          path: |
-            BiblioBack/target/
-            !BiblioBack/target/**/*.jar
+          ./mvnw test -B

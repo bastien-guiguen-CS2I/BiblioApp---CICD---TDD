@@ -23,22 +23,26 @@
     </properties>
 
     <dependencies>
+        <!-- Web layer -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Persistence layer -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- In-memory database for local development and tests -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Test stack: JUnit, Mockito, Hamcrest, Spring test support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -47,6 +51,7 @@
     </dependencies>
 
     <build>
+        <!-- Build plugins -->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
