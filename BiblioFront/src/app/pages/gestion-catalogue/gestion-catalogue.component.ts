@@ -2,10 +2,11 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { mockRessources, mockExemplaires } from '../../services/mock-data';
+import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Livre, Revue } from '../../models/models';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 import { NotificationService } from '../../services/notification.service';
+import { RessourceService } from '../../services/ressource.service';
 
 @Component({
     selector: 'app-gestion-catalogue',
@@ -19,6 +20,7 @@ export class GestionCatalogueComponent implements OnInit {
     isLoading = signal(true);
 
     constructor(
+        private ressourceService: RessourceService,
         private confirmDialogService: ConfirmDialogService,
         private notificationService: NotificationService
     ) { }
@@ -42,19 +44,25 @@ export class GestionCatalogueComponent implements OnInit {
         );
     };
 
-    getExempCount(ressourceId: string): number {
+    getExempCount(ressourceId: string | number): number {
         return mockExemplaires.filter(ex => ex.ressourceId === ressourceId).length;
     }
 
     fetchRessources(): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            this.ressources.set(mockRessources);
-            this.isLoading.set(false);
-        }, 300);
+        this.ressourceService.getAllRessources().subscribe({
+            next: (ressources) => {
+                this.ressources.set(ressources);
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement des ressources', err);
+                this.isLoading.set(false);
+            }
+        });
     }
 
-    handleDelete(id: string): void {
+    handleDelete(id: string | number): void {
         this.confirmDialogService.open({
             title: 'Supprimer la ressource',
             message: 'Êtes-vous sûr de vouloir supprimer cette ressource?',
@@ -63,10 +71,18 @@ export class GestionCatalogueComponent implements OnInit {
             isDestructive: true
         }).subscribe(result => {
             if (result) {
-                this.ressources.update(res =>
-                    res.filter(r => r.id !== id)
-                );
-                this.notificationService.success('Ressource supprimée avec succès');
+                this.ressourceService.deleteRessource(id).subscribe({
+                    next: () => {
+                        this.ressources.update(res =>
+                            res.filter(r => r.id !== id)
+                        );
+                        this.notificationService.success('Ressource supprimée avec succès');
+                    },
+                    error: (err) => {
+                        console.error('Erreur lors de la suppression', err);
+                        this.notificationService.error('Erreur lors de la suppression de la ressource');
+                    }
+                });
             }
         });
     }

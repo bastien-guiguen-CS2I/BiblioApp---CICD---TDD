@@ -2,8 +2,8 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { mockRessources } from '../../services/mock-data';
 import { Ressource, Livre } from '../../models/models';
+import { RessourceService } from '../../services/ressource.service';
 
 @Component({
     selector: 'app-consultation-catalogue',
@@ -19,6 +19,8 @@ export class ConsultationCatalogueComponent implements OnInit {
     categorie = '';
     isAdvanced = signal(false);
     isLoading = signal(false);
+
+    constructor(private ressourceService: RessourceService) { }
 
     ngOnInit(): void {
         this.fetchRessources();
@@ -56,9 +58,15 @@ export class ConsultationCatalogueComponent implements OnInit {
 
     fetchRessources(): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            this.ressources.set(mockRessources);
-            this.isLoading.set(false);
-        }, 300);
+        this.ressourceService.getAllRessources().subscribe({
+            next: (ressources) => {
+                this.ressources.set(ressources);
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement des ressources', err);
+                this.isLoading.set(false);
+            }
+        });
     }
 }

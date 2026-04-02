@@ -1,9 +1,10 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { mockRessources, mockExemplaires } from '../../services/mock-data';
+import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Exemplaire, Livre } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { RessourceService } from '../../services/ressource.service';
 
 @Component({
     selector: 'app-detail-livre',
@@ -24,6 +25,7 @@ export class DetailLivreComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
+        private ressourceService: RessourceService,
         private notificationService: NotificationService
     ) { }
 
@@ -38,16 +40,19 @@ export class DetailLivreComponent implements OnInit {
 
     getIsbnOrNA(): string {
         if (!this.ressource()) return 'N/A';
-        if (this.ressource()!.type === 'livre') {
-            const livre = this.ressource() as Livre;
-            return livre.isbn || 'N/A';
+        const res = this.ressource()!;
+        if (this.isLivre(res)) {
+            // Access directly via indexing to avoid type issues
+            const codeISBN = (res as any)['codeISBN'];
+            return codeISBN || 'N/A';
         }
         return 'N/A';
     }
 
     getAuthorOrVolume(): string {
         if (!this.ressource()) return '';
-        if (this.ressource()!.type === 'livre') {
+        const res = this.ressource()!;
+        if (this.isLivre(res)) {
             const livre = this.ressource() as Livre;
             return livre.auteur;
         }
@@ -55,18 +60,25 @@ export class DetailLivreComponent implements OnInit {
         return `Volume ${revue.numeroVolume}`;
     }
 
-    loadRessource(id: string): void {
+    isLivre(ressource: Ressource): boolean {
+        return ressource.type.toLowerCase() === 'livre';
+    }
+
+    loadRessource(id: string | number): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            const res = mockRessources.find(r => r.id === id);
-            if (res) {
+        this.ressourceService.getRessourceById(id).subscribe({
+            next: (res) => {
                 this.ressource.set(res);
                 this.exemplaires.set(
                     mockExemplaires.filter(ex => ex.ressourceId === id)
                 );
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement de la ressource', err);
+                this.isLoading.set(false);
             }
-            this.isLoading.set(false);
-        }, 300);
+        });
     }
 
     goBack(): void {

@@ -2,15 +2,16 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { mockRessources, mockExemplaires } from '../../services/mock-data';
+import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Livre, Revue } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { RessourceService } from '../../services/ressource.service';
 
 interface ModifyResourceForm {
     titre: string;
     auteur: string;
     volume: string;
-    isbn: string;
+    codeISBN: string;
     datePublication: string;
     caution: number;
     localisation: string;
@@ -31,7 +32,7 @@ export class ModificationLivreComponent implements OnInit {
         titre: '',
         auteur: '',
         volume: '',
-        isbn: '',
+        codeISBN: '',
         datePublication: '',
         caution: 0,
         localisation: ''
@@ -43,6 +44,7 @@ export class ModificationLivreComponent implements OnInit {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
+        private ressourceService: RessourceService,
         private notificationService: NotificationService
     ) { }
 
@@ -56,26 +58,29 @@ export class ModificationLivreComponent implements OnInit {
         });
     }
 
-    loadRessource(id: string): void {
+    loadRessource(id: string | number): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            const res = mockRessources.find(r => r.id === id);
-            if (res) {
+        this.ressourceService.getRessourceById(id).subscribe({
+            next: (res) => {
                 this.resource.set(res);
                 const formData: ModifyResourceForm = {
                     titre: res.titre,
                     auteur: res.type === 'livre' ? (res as Livre).auteur : '',
                     volume: res.type === 'revue' ? String((res as Revue).numeroVolume) : '',
-                    isbn: res.type === 'livre' ? ((res as Livre).isbn || '') : '',
+                    codeISBN: res.type === 'livre' ? ((res as Livre).codeISBN || '') : '',
                     datePublication: res.datePublication || '',
                     caution: res.caution,
                     localisation: res.localisation || ''
                 };
                 this.form.set(formData);
                 this.exemplairesCount.set(mockExemplaires.filter(ex => ex.ressourceId === id).length);
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement de la ressource', err);
+                this.isLoading.set(false);
             }
-            this.isLoading.set(false);
-        }, 300);
+        });
     }
 
     getType(): 'livre' | 'revue' | null {
@@ -118,37 +123,37 @@ export class ModificationLivreComponent implements OnInit {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        setTimeout(() => {
-            const index = mockRessources.findIndex(r => r.id === res.id);
-            if (index >= 0) {
-                if (res.type === 'livre') {
-                    mockRessources[index] = {
-                        ...res,
-                        titre: formValue.titre,
-                        auteur: formValue.auteur,
-                        isbn: formValue.isbn,
-                        datePublication: formValue.datePublication,
-                        caution: formValue.caution,
-                        localisation: formValue.localisation
-                    } as Livre;
-                } else {
-                    mockRessources[index] = {
-                        ...res,
-                        titre: formValue.titre,
-                        numeroVolume: parseInt(formValue.volume, 10) || 1,
-                        datePublication: formValue.datePublication,
-                        caution: formValue.caution,
-                        localisation: formValue.localisation
-                    } as Revue;
-                }
-            }
+        const updatedRessource: Ressource = res.type === 'livre'
+            ? {
+                ...res,
+                titre: formValue.titre,
+                auteur: formValue.auteur,
+                codeISBN: formValue.codeISBN,
+                datePublication: formValue.datePublication,
+                caution: formValue.caution,
+                localisation: formValue.localisation
+            } as Livre
+            : {
+                ...res,
+                titre: formValue.titre,
+                numeroVolume: parseInt(formValue.volume, 10) || 1,
+                datePublication: formValue.datePublication,
+                caution: formValue.caution,
+                localisation: formValue.localisation
+            } as Revue;
 
-            this.isSubmitting.set(false);
-            this.notificationService.success('La ressource a été modifiée avec succès');
-            setTimeout(() => {
+        this.ressourceService.updateRessource(res.id as string | number, updatedRessource).subscribe({
+            next: () => {
+                this.isSubmitting.set(false);
+                this.notificationService.success('La ressource a été modifiée avec succès');
                 this.router.navigate(['/gestion/catalogue']);
-            }, 1000);
-        }, 500);
+            },
+            error: (err) => {
+                console.error('Erreur lors de la modification de la ressource', err);
+                this.isSubmitting.set(false);
+                this.notificationService.error('Erreur lors de la modification de la ressource');
+            }
+        });
     }
 
     handleCancel(): void {

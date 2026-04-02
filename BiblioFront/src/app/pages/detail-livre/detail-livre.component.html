@@ -15,8 +15,8 @@
                     <div>
                         <div class="flex items-center gap-3 mb-3">
                             <span [class]="'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ' +
-                (ressource()!.type === 'livre' ? 'bg-primary/20 text-primary' : 'bg-purple-100 text-purple-800')">
-                                {{ ressource()!.type === 'livre' ? 'Livre' : 'Revue' }}
+                (isLivre(ressource()!) ? 'bg-primary/20 text-primary' : 'bg-purple-100 text-purple-800')">
+                                {{ isLivre(ressource()!) ? 'Livre' : 'Revue' }}
                             </span>
                         </div>
 

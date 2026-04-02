@@ -2,16 +2,17 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { mockRessources, mockExemplaires } from '../../services/mock-data';
+import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Livre, Revue } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { RessourceService } from '../../services/ressource.service';
 
 interface AddResourceForm {
     type: 'livre' | 'revue';
     titre: string;
     auteur: string;
     volume: string;
-    isbn: string;
+    codeISBN: string;
     datePublication: string;
     caution: number;
     localisation: string;
@@ -30,7 +31,7 @@ export class AjouterLivreComponent {
         titre: '',
         auteur: '',
         volume: '',
-        isbn: '',
+        codeISBN: '',
         datePublication: '',
         caution: 0,
         localisation: '',
@@ -41,6 +42,7 @@ export class AjouterLivreComponent {
 
     constructor(
         private router: Router,
+        private ressourceService: RessourceService,
         private notificationService: NotificationService
     ) { }
 
@@ -50,7 +52,7 @@ export class AjouterLivreComponent {
             type: newType,
             auteur: '',
             volume: '',
-            isbn: ''
+            codeISBN: ''
         }));
     }
 
@@ -90,46 +92,50 @@ export class AjouterLivreComponent {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        setTimeout(() => {
-            const newId = `R${Math.random().toString(36).substring(2, 11)}`;
-
-            const newRessource: Ressource = formValue.type === 'livre'
-                ? {
-                    id: newId,
-                    type: 'livre',
-                    titre: formValue.titre,
-                    auteur: formValue.auteur,
-                    isbn: formValue.isbn,
-                    caution: formValue.caution,
-                    localisation: formValue.localisation,
-                    datePublication: formValue.datePublication
-                } as Livre
-                : {
-                    id: newId,
-                    type: 'revue',
-                    titre: formValue.titre,
-                    numeroVolume: parseInt(formValue.volume, 10) || 1,
-                    caution: formValue.caution,
-                    localisation: formValue.localisation,
-                    datePublication: formValue.datePublication
-                } as Revue;
-
-            mockRessources.push(newRessource);
-
-            // Create exemplaires
-            for (let i = 0; i < formValue.nombreExemplaires; i++) {
-                mockExemplaires.push({
-                    id: `EX${Math.random().toString(36).substring(2, 11)}`,
-                    ressourceId: newId,
-                    barcode: `BAR${Date.now()}${i}`,
-                    disponible: true
-                });
+        // Build the object without id (API will generate it)
+        const newRessource = formValue.type === 'livre'
+            ? {
+                type: 'livre' as const,
+                titre: formValue.titre,
+                auteur: formValue.auteur,
+                codeISBN: formValue.codeISBN,
+                caution: formValue.caution,
+                localisation: formValue.localisation,
+                datePublication: formValue.datePublication,
+                emplacementId: 1
             }
+            : {
+                type: 'revue' as const,
+                titre: formValue.titre,
+                numeroVolume: parseInt(formValue.volume, 10) || 1,
+                caution: formValue.caution,
+                localisation: formValue.localisation,
+                datePublication: formValue.datePublication,
+                emplacementId: 1
+            };
 
-            this.isSubmitting.set(false);
-            this.notificationService.success('Ressource ajoutée avec succès');
-            this.router.navigate(['/gestion/catalogue']);
-        }, 500);
+        this.ressourceService.createRessource(newRessource as any).subscribe({
+            next: (createdRessource) => {
+                // Create exemplaires for mock (optional)
+                for (let i = 0; i < formValue.nombreExemplaires; i++) {
+                    mockExemplaires.push({
+                        id: `EX${Math.random().toString(36).substring(2, 11)}`,
+                        ressourceId: createdRessource.id as string,
+                        barcode: `BAR${Date.now()}${i}`,
+                        disponible: true
+                    });
+                }
+
+                this.isSubmitting.set(false);
+                this.notificationService.success('Ressource ajoutée avec succès');
+                this.router.navigate(['/gestion/catalogue']);
+            },
+            error: (err) => {
+                console.error('Erreur lors de la création de la ressource', err);
+                this.isSubmitting.set(false);
+                this.notificationService.error('Erreur lors de la création de la ressource');
+            }
+        });
     }
 
     handleCancel(): void {

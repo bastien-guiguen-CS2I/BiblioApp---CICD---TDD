@@ -44,11 +44,11 @@ export interface Particulier extends BaseUser {
 export type Utilisateur = Enseignant | Etudiant | Particulier;
 
 export interface BaseRessource {
-    id: string;
+    id: number | string;
     titre: string;
     type: ResourceType;
     caution: number;
-    emplacementId?: string;
+    emplacementId?: number | string;
     localisation?: string;
     datePublication?: string;
 }
@@ -56,7 +56,7 @@ export interface BaseRessource {
 export interface Livre extends BaseRessource {
     type: 'livre';
     auteur: string;
-    isbn?: string;
+    codeISBN?: string;
 }
 
 export interface Revue extends BaseRessource {
