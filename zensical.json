@@ -1,0 +1,16 @@
+﻿{
+  "site_name": "BiblioApp - CICD - TDD Documentation",
+  "site_url": "https://zensical.org/biblio-app",
+  "docs_dir": "docs",
+  "site_dir": "docs_build",
+  "theme": "material",
+  "nav": [
+    { "Home": "index.md" },
+    { "Architecture": ["architecture/overview.md", "architecture/backend.md", "architecture/frontend.md"] },
+    { "Backend": ["backend/setup.md", "backend/api.md", "backend/testing.md"] },
+    { "Frontend": ["frontend/setup.md", "frontend/components.md"] },
+    { "CI/CD": ["cicd/workflows.md", "cicd/deployment.md"] },
+    { "Development": ["development/contributing.md", "development/conventions.md"] }
+  ],
+  "plugins": ["search"]
+}
