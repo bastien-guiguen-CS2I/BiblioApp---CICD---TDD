@@ -1,0 +1,121 @@
+<div class="max-w-2xl mx-auto py-8" *ngIf="!isLoading()">
+    <div class="mb-8">
+        <button (click)="handleCancel()"
+            class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition font-medium">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Retour aux utilisateurs
+        </button>
+        <h1 class="text-3xl font-bold text-gray-900">Modifier un Utilisateur</h1>
+        <p class="text-gray-500 mt-2" *ngIf="user()">
+            {{ user()?.prenom }} {{ user()?.nom }} ({{ user()?.type }})
+        </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <form (ngSubmit)="handleSubmit()" class="space-y-6" *ngIf="user()">
+
+            <!-- Type Badge -->
+            <div class="inline-block px-3 py-1 rounded-full text-sm font-medium" [ngClass]="{
+          'bg-primary/20 text-primary': user()?.type === 'etudiant',
+          'bg-green-100 text-green-800': user()?.type === 'enseignant',
+          'bg-purple-100 text-purple-800': user()?.type === 'particulier'
+        }">
+                {{ user()?.type === 'etudiant' ? 'Étudiant' : user()?.type === 'enseignant' ? 'Enseignant' :
+                'Particulier' }}
+            </div>
+
+            <!-- Basic Info -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                    <input type="text" [(ngModel)]="form().nom" [ngModelOptions]="{updateOn: 'change'}" name="nom"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                    <input type="text" [(ngModel)]="form().prenom" [ngModelOptions]="{updateOn: 'change'}" name="prenom"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                </div>
+            </div>
+
+            <!-- Email & Phone -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" [(ngModel)]="form().email" [ngModelOptions]="{updateOn: 'change'}" name="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                    <input type="tel" [(ngModel)]="form().telephone" [ngModelOptions]="{updateOn: 'change'}"
+                        name="telephone"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
+                <input type="text" [(ngModel)]="form().adresse" [ngModelOptions]="{updateOn: 'change'}" name="adresse"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <!-- Type-specific fields -->
+            <div *ngIf="getType() === 'etudiant'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Année d'études</label>
+                <select [(ngModel)]="form().annee" [ngModelOptions]="{updateOn: 'change'}" name="annee"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+                    <option [value]="1">1ère année</option>
+                    <option [value]="2">2e année</option>
+                    <option [value]="3">3e année</option>
+                    <option [value]="4">4e année</option>
+                    <option [value]="5">5e année</option>
+                </select>
+            </div>
+
+            <div *ngIf="getType() === 'enseignant'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Département</label>
+                <input type="text" [(ngModel)]="form().departement" [ngModelOptions]="{updateOn: 'change'}"
+                    name="departement"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <div *ngIf="getType() === 'particulier'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Organisation</label>
+                <input type="text" [(ngModel)]="form().organisation" [ngModelOptions]="{updateOn: 'change'}"
+                    name="organisation"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <!-- Caution -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Solde caution (€)</label>
+                <input type="number" [(ngModel)]="form().solde" [ngModelOptions]="{updateOn: 'change'}" name="solde"
+                    min="0" step="0.01"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3 pt-6 border-t border-gray-200">
+                <button type="button" (click)="handleCancel()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium">
+                    Annuler
+                </button>
+                <button type="submit" [disabled]="isSubmitting()"
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50">
+                    {{ isSubmitting() ? 'Modification...' : 'Enregistrer' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading -->
+<div *ngIf="isLoading()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p class="mt-4 text-gray-500">Chargement...</p>
+    </div>
+</div>

@@ -1,43 +1,50 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-export interface Ressource {
-    id?: number;
-    titre: string;
-    type: string;
-    emplacementId: number;
-    auteur?: string;
-    codeISBN?: string;
-    numeroVolume?: number;
-    dateParution?: string;
-}
+import { Observable, of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
+import { mockRessources } from './mock-data';
+import { Ressource } from '../models/models';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RessourceService {
-    private readonly apiUrl = '/api/ressources';
 
-    constructor(private http: HttpClient) { }
+    constructor() { }
 
     getAllRessources(): Observable<Ressource[]> {
-        return this.http.get<Ressource[]>(this.apiUrl);
+        return of([...mockRessources]).pipe(delay(300));
     }
 
-    getRessourceById(id: number): Observable<Ressource> {
-        return this.http.get<Ressource>(`${this.apiUrl}/${id}`);
+    getRessourceById(id: string): Observable<Ressource> {
+        const ressource = mockRessources.find(r => r.id === id);
+        if (!ressource) {
+            return throwError(() => new Error(`Ressource avec l'id ${id} non trouvée`));
+        }
+        return of(ressource).pipe(delay(200));
     }
 
     createRessource(ressource: Ressource): Observable<Ressource> {
-        return this.http.post<Ressource>(this.apiUrl, ressource);
+        const newRessource: Ressource = {
+            ...ressource,
+            id: `r${Date.now()}`
+        };
+        return of(newRessource).pipe(delay(300));
     }
 
-    updateRessource(id: number, ressource: Ressource): Observable<Ressource> {
-        return this.http.put<Ressource>(`${this.apiUrl}/${id}`, ressource);
+    updateRessource(id: string, ressource: Ressource): Observable<Ressource> {
+        const existingIndex = mockRessources.findIndex(r => r.id === id);
+        if (existingIndex === -1) {
+            return throwError(() => new Error(`Ressource avec l'id ${id} non trouvée`));
+        }
+        const updated = { ...ressource, id };
+        return of(updated).pipe(delay(300));
     }
 
-    deleteRessource(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    deleteRessource(id: string): Observable<void> {
+        const exists = mockRessources.some(r => r.id === id);
+        if (!exists) {
+            return throwError(() => new Error(`Ressource avec l'id ${id} non trouvée`));
+        }
+        return of(void 0).pipe(delay(300));
     }
 }

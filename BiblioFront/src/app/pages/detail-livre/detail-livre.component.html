@@ -1,0 +1,104 @@
+<div class="max-w-4xl mx-auto space-y-6">
+    <button (click)="goBack()" class="flex items-center text-gray-500 hover:text-primary transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour au catalogue
+    </button>
+
+    <div *ngIf="!isLoading() && ressource()"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-8">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Left Col: Info -->
+                <div class="flex-1 space-y-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <span [class]="'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ' +
+                (ressource()!.type === 'livre' ? 'bg-primary/20 text-primary' : 'bg-purple-100 text-purple-800')">
+                                {{ ressource()!.type === 'livre' ? 'Livre' : 'Revue' }}
+                            </span>
+                        </div>
+
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ ressource()!.titre }}</h1>
+                        <p class="text-lg text-gray-600">{{ getAuthorOrVolume() }}</p>
+                    </div>
+
+                    <div class="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                        <p class="text-sm text-primary mb-2 font-medium">Disponibilité</p>
+                        <div class="flex items-center gap-3">
+                            <span *ngIf="dispoCount() > 0" class="flex items-center text-2xl font-bold text-green-600">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                {{ dispoCount() }}
+                            </span>
+                            <span *ngIf="dispoCount() === 0" class="flex items-center text-2xl font-bold text-red-600">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                0
+                            </span>
+                            <span class="text-gray-600">exemplaire(s) disponible(s)</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code ISBN</label>
+                            <p class="text-gray-900 font-mono">{{ getIsbnOrNA() }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Caution requise</label>
+                            <p class="text-gray-900 font-bold">{{ ressource()!.caution }} €</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Localisation
+                        </p>
+                        <p class="text-gray-900">{{ ressource()!.localisation || 'Non spécifiée' }}</p>
+                    </div>
+                </div>
+
+                <!-- Right Col: Action & Exemplaires -->
+                <div class="md:w-80 space-y-6">
+                    <button (click)="handleBorrow()" [disabled]="!dispoCount() || isBorrowing()" [class]="'w-full py-3 px-4 rounded-lg font-medium text-white transition ' +
+              (dispoCount() 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'bg-gray-400 cursor-not-allowed')">
+                        {{ isBorrowing() ? 'Emprunt en cours...' : 'Emprunter' }}
+                    </button>
+
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <p class="font-medium text-gray-900 text-sm">Liste des exemplaires ({{ exemplaires().length }})
+                        </p>
+                        <div class="space-y-2 max-h-96 overflow-y-auto">
+                            <div *ngFor="let ex of exemplaires()"
+                                class="flex items-center justify-between p-2 bg-white rounded border"
+                                [class.border-green-200]="ex.disponible" [class.border-red-200]="!ex.disponible">
+                                <span class="text-sm font-mono text-gray-600">{{ ex.barcode }}</span>
+                                <span [class]="'text-xs font-medium px-2 py-1 rounded ' +
+                  (ex.disponible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+                                    {{ ex.disponible ? 'Disponible' : 'Emprunté' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading()" class="text-center py-12">Chargement...</div>
+</div>

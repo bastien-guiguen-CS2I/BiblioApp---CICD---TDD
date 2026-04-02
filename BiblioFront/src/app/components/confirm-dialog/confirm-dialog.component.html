@@ -1,0 +1,26 @@
+@if (isOpen()) {
+<div class="fixed inset-0 bg-black/50 z-40 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">{{ options()?.title }}</h2>
+        </div>
+
+        <div class="px-6 py-4">
+            <p class="text-gray-600">{{ options()?.message }}</p>
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <button (click)="dialogService.cancel()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                {{ options()?.cancelText || 'Annuler' }}
+            </button>
+            <button (click)="dialogService.confirm()" [class.bg-red-600]="options()?.isDestructive"
+                [class.hover:bg-red-700]="options()?.isDestructive" [class.bg-primary]="!options()?.isDestructive"
+                [class.hover:bg-blue-700]="!options()?.isDestructive"
+                class="px-4 py-2 text-sm font-medium text-white rounded-lg transition">
+                {{ options()?.confirmText || 'Confirmer' }}
+            </button>
+        </div>
+    </div>
+</div>
+}

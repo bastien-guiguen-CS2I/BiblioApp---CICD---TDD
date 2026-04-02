@@ -1,0 +1,144 @@
+<div class="container mx-auto px-4 lg:px-6 py-8 lg:py-12">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <button (click)="handleCancel()"
+                class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition font-medium">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Retour
+            </button>
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900">Ajouter une ressource</h1>
+            <p class="text-gray-600 mt-3">Créez un nouveau livre ou magazine dans le système</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 lg:p-10">
+            <form (ngSubmit)="handleSubmit()" class="space-y-8">
+
+                <!-- Type Selection -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-900 mb-4">Type de ressource *</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition"
+                            [class.border-primary]="form().type === 'livre'"
+                            [class.border-gray-200]="form().type !== 'livre'"
+                            [class.bg-primary/10]="form().type === 'livre'" [class.bg-white]="form().type !== 'livre'">
+                            <input type="radio" name="type" value="livre" (change)="onTypeChange('livre')"
+                                class="w-4 h-4 text-primary" />
+                            <span class="ml-4">
+                                <span class="font-semibold text-gray-900">Livre</span>
+                                <span class="text-sm text-gray-500 block">Monographie</span>
+                            </span>
+                        </label>
+                        <label class="relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition"
+                            [class.border-primary]="form().type === 'revue'"
+                            [class.border-gray-200]="form().type !== 'revue'"
+                            [class.bg-primary/10]="form().type === 'revue'" [class.bg-white]="form().type !== 'revue'">
+                            <input type="radio" name="type" value="revue" (change)="onTypeChange('revue')"
+                                class="w-4 h-4 text-primary" />
+                            <span class="ml-4">
+                                <span class="font-semibold text-gray-900">Revue</span>
+                                <span class="text-sm text-gray-500 block">Publication périodique</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Titre <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" [(ngModel)]="form().titre" name="titre" placeholder="Titre du livre/revue"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                </div>
+
+                <!-- Dynamic Fields Based on Type -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Author (for Livre) -->
+                    <div *ngIf="form().type === 'livre'">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Auteur <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" [(ngModel)]="form().auteur" name="auteur" placeholder="Nom de l'auteur"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+
+                    <!-- Volume (for Revue) -->
+                    <div *ngIf="form().type === 'revue'">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Numéro de volume <span
+                                class="text-red-500">*</span></label>
+                        <input type="number" [(ngModel)]="form().volume" name="volume" placeholder="Ex: 42" min="1"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+
+                    <!-- ISBN (for Livre) -->
+                    <div *ngIf="form().type === 'livre'">
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">ISBN</label>
+                        <input type="text" [(ngModel)]="form().isbn" name="isbn" placeholder="978-2-7242-7703-1"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+
+                    <!-- Publication Date -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Date de publication</label>
+                        <input type="date" [(ngModel)]="form().datePublication" name="datePublication"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+                </div>
+
+                <!-- Bottom Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Caution -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Caution (€) <span
+                                class="text-red-500">*</span></label>
+                        <input type="number" [(ngModel)]="form().caution" name="caution" placeholder="50" min="0"
+                            step="0.01"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+
+                    <!-- Exemplaires -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">Exemplaires <span
+                                class="text-red-500">*</span></label>
+                        <input type="number" [(ngModel)]="form().nombreExemplaires" name="nombreExemplaires" min="1"
+                            max="50"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                    </div>
+                </div>
+
+                <!-- Localisation -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Localisation</label>
+                    <input type="text" [(ngModel)]="form().localisation" name="localisation"
+                        placeholder="Ex: Rayon 1, Étagère A"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" />
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-8 border-t border-gray-200">
+                    <button type="button" (click)="handleCancel()"
+                        class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-semibold">
+                        Annuler
+                    </button>
+                    <button type="submit" [disabled]="isSubmitting()"
+                        class="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        @if (isSubmitting()) {
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <span>Création en cours...</span>
+                        } @else {
+                        <span>Créer la ressource</span>
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
