@@ -21,11 +21,20 @@ public class BiblioBackApplication {
 	@Bean
 	public CommandLineRunner initializeData(RessourceRepository repository) {
 		return (args) -> {
-			repository.save(new Livre("Clean Code", "LIVRE", 1, "Robert C. Martin", "978-0132350884"));
-			repository.save(new Livre("Design Patterns", "LIVRE", 2, "Gang of Four", "978-0201633610"));
-			repository.save(new Livre("The Pragmatic Programmer", "LIVRE", 3, "David Thomas", "978-0135957059"));
-			repository.save(new Revue("Science & Nature", "REVUE", 4, 15, LocalDate.of(2024, 3, 15)));
-			repository.save(new Revue("Tech Weekly", "REVUE", 5, 22, LocalDate.of(2024, 3, 20)));
+			repository.save(new Livre("Clean Code", "LIVRE", 1, 40, "Rayon 1, Étagère A", LocalDate.of(2008, 8, 11),
+					"Robert C. Martin", "978-0132350884"));
+			repository.save(new Livre("Design Patterns", "LIVRE", 1, 45, "Rayon 1, Étagère A",
+					LocalDate.of(1994, 11, 10), "Erich Gamma", "978-0201633610"));
+			repository.save(new Livre("L'Étranger", "LIVRE", 3, 15, "Rayon 3, Étagère C", LocalDate.of(1942, 6, 15),
+					"Albert Camus", "978-2070360024"));
+			repository.save(new Livre("Le Crime de l'Orient-Express", "LIVRE", 4, 20, "Rayon 4, Étagère A",
+					LocalDate.of(1934, 1, 1), "Agatha Christie", "978-2253010425"));
+			repository.save(new Livre("Une brève histoire du temps", "LIVRE", 2, 30, "Rayon 2, Étagère B",
+					LocalDate.of(1988, 4, 1), "Stephen Hawking", "978-2081422000"));
+			repository.save(
+					new Revue("Science & Vie", "REVUE", 2, 10, "Rayon 2, Étagère B", LocalDate.of(2023, 10, 1), 1250));
+			repository
+					.save(new Revue("L'Histoire", "REVUE", 5, 10, "Rayon 5, Étagère A", LocalDate.of(2023, 9, 1), 500));
 		};
 	}
 }

@@ -3,6 +3,7 @@ package BiblioApp.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import java.time.LocalDate;
 
 @Entity
 @DiscriminatorValue("LIVRE")
@@ -17,8 +18,9 @@ public class Livre extends Ressource {
     public Livre() {
     }
 
-    public Livre(String titre, String type, Integer emplacementId, String auteur, String codeISBN) {
-        super(titre, type, emplacementId);
+    public Livre(String titre, String type, Integer emplacementId, Integer caution, String localisation,
+            LocalDate datePublication, String auteur, String codeISBN) {
+        super(titre, type, emplacementId, caution, localisation, datePublication);
         this.auteur = auteur;
         this.codeISBN = codeISBN;
     }
