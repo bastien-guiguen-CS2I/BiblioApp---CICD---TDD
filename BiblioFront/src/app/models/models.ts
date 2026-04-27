@@ -1,4 +1,4 @@
-export type UserType = 'enseignant' | 'etudiant' | 'particulier';
+export type UserType = 'enseignant' | 'etudiant' | 'particulier' | 'bibliothecaire';
 export type ResourceType = 'livre' | 'revue';
 
 export interface Emplacement {
@@ -41,7 +41,12 @@ export interface Particulier extends BaseUser {
     organisation: string;
 }
 
-export type Utilisateur = Enseignant | Etudiant | Particulier;
+export interface Bibliothecaire extends BaseUser {
+    type: 'bibliothecaire';
+    numeroEmploye: string;
+}
+
+export type Utilisateur = Enseignant | Etudiant | Particulier | Bibliothecaire;
 
 export interface BaseRessource {
     id: number | string;

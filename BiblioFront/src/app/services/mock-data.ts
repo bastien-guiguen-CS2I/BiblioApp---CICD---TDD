@@ -75,8 +75,8 @@ export const mockUtilisateurs: Utilisateur[] = [
         email: 'admin@biblioapp.fr',
         telephone: '+33 1 40 51 75 85',
         adresse: 'Bibliothèque Universitaire, 123 Rue de la Sorbonne, Paris',
-        type: 'particulier',
-        organisation: 'Université Paris-Sorbonne'
+        type: 'bibliothecaire',
+        numeroEmploye: 'Université Paris-Sorbonne'
     }
 ];
 
