@@ -1,0 +1,26 @@
+site_name: BiblioApp - CICD - TDD Documentation
+docs_dir: docs
+site_dir: site
+theme:
+  name: material
+plugins:
+  - search
+nav:
+  - Home: index.md
+  - Architecture:
+      - architecture/overview.md
+      - architecture/backend.md
+      - architecture/frontend.md
+  - Backend:
+      - backend/setup.md
+      - backend/api.md
+      - backend/testing.md
+  - Frontend:
+      - frontend/setup.md
+      - frontend/components.md
+  - CI/CD:
+      - cicd/workflows.md
+      - cicd/deployment.md
+  - Development:
+      - development/contributing.md
+      - development/conventions.md
