@@ -44,5 +44,5 @@ jobs:
 
       - name: Build & Push Docs
         run: |
-          docker build -t $REGISTRY/docs:latest ./docs
+          docker build -f docs/Dockerfile -t $REGISTRY/docs:latest .
           docker push $REGISTRY/docs:latest

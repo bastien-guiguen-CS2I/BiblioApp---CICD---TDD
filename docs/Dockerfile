@@ -2,7 +2,8 @@ FROM python:3.12-slim AS build
 
 WORKDIR /app
 
-COPY . .
+COPY zensical.toml zensical.json mkdocs.yml ./
+COPY docs/ ./docs/
 
 RUN pip install --no-cache-dir zensical
 RUN zensical build --clean
