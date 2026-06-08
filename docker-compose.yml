@@ -1,0 +1,54 @@
+services:
+  back:
+    build:
+      context: ./BiblioBack
+      dockerfile: Dockerfile
+    image: biblioapp-back:local
+    container_name: biblio-back
+    ports:
+      - "8080:8080"
+    networks:
+      - biblio-net
+
+  swagger:
+    build:
+      context: ./docker/swagger
+      dockerfile: Dockerfile
+    image: biblioapp-swagger:local
+    container_name: biblio-swagger
+    depends_on:
+      - back
+    ports:
+      - "8081:8080"
+    networks:
+      - biblio-net
+    environment:
+      - SWAGGER_JSON_URL=http://back:8080/v3/api-docs
+
+  front:
+    build:
+      context: ./BiblioFront
+      dockerfile: Dockerfile
+    image: biblioapp-front:local
+    container_name: biblio-front
+    depends_on:
+      - back
+    ports:
+      - "4200:80"
+    networks:
+      - biblio-net
+
+  docs:
+    build:
+      context: .
+      dockerfile: docs/Dockerfile
+    image: biblioapp-docs:local
+    container_name: biblio-docs
+    ports:
+      - "8082:80"
+    networks:
+      - biblio-net
+
+networks:
+  biblio-net:
+    driver: bridge

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'BiblioBack/**'
+      - 'BiblioFront/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'BiblioBack/**'
+      - 'BiblioFront/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  backend:
+    uses: ./.github/workflows/build-back.yml
+
+  frontend:
+    uses: ./.github/workflows/build-front.yml
+
+  docs:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/docs.yml
+
+  docker:
+    uses: ./.github/workflows/build-docker.yml
