@@ -12,6 +12,9 @@ jobs:
       contents: read
       packages: write
 
+    env:
+      REGISTRY: ghcr.io/bastien-guiguen-cs2i/biblioapp
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,20 +30,20 @@ jobs:
 
       - name: Build & Push Back
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/back:latest ./BiblioBack
-          docker push ghcr.io/${{ github.repository }}/back:latest
+          docker build -t $REGISTRY/back:latest ./BiblioBack
+          docker push $REGISTRY/back:latest
 
       - name: Build & Push Front
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/front:latest ./BiblioFront
-          docker push ghcr.io/${{ github.repository }}/front:latest
+          docker build -t $REGISTRY/front:latest ./BiblioFront
+          docker push $REGISTRY/front:latest
 
       - name: Build & Push Swagger
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/swagger:latest ./docker/swagger
-          docker push ghcr.io/${{ github.repository }}/swagger:latest
+          docker build -t $REGISTRY/swagger:latest ./docker/swagger
+          docker push $REGISTRY/swagger:latest
 
       - name: Build & Push Docs
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/docs:latest ./docs
-          docker push ghcr.io/${{ github.repository }}/docs:latest
+          docker build -t $REGISTRY/docs:latest ./docs
+          docker push $REGISTRY/docs:latest
