@@ -2,7 +2,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
-            <p class="text-gray-500 mt-2">Gérez les comptes et les cautions</p>
+            <p class="text-gray-500 mt-2">Gérez les comptes utilisateurs et les droits bibliothécaire</p>
         </div>
         <a routerLink="/gestion/utilisateurs/ajouter"
             class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2 whitespace-nowrap">
@@ -69,7 +69,8 @@
                         <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                             <span [class]="'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold capitalize ' +
                 (user.type === 'enseignant' ? 'bg-primary/20 text-primary' :
-                 user.type === 'etudiant' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')">
+                 user.type === 'etudiant' ? 'bg-green-100 text-green-800' :
+                 user.type === 'bibliothecaire' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800')">
                                 {{ user.type }}
                             </span>
                         </td>
@@ -78,8 +79,8 @@
                         </td>
                         <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                             <span
-                                [class]="'text-sm font-semibold ' + ((getCompte(user.id)?.solde || 0) < 20 ? 'text-red-600' : 'text-gray-900')">
-                                {{ getCompte(user.id)?.solde || 0 }} €
+                                [class]="'text-sm font-semibold ' + ((user.compte?.soldeDisponible || 0) < 20 ? 'text-red-600' : 'text-gray-900')">
+                                {{ user.compte?.soldeDisponible || 0 }} €
                             </span>
                         </td>
                         <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-right">

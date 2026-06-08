@@ -1,8 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { mockUtilisateurs } from './mock-data';
+import { Observable, throwError } from 'rxjs';
+import { UtilisateurService } from './utilisateur.service';
 import { Utilisateur } from '../models/models';
 
 @Injectable({
@@ -13,7 +12,10 @@ export class AuthService {
     isAuthenticated = signal(false);
     isAdmin = signal(false);
 
-    constructor(private router: Router) {
+    constructor(
+        private router: Router,
+        private utilisateurService: UtilisateurService
+    ) {
         this.loadUserFromStorage();
     }
 
@@ -32,23 +34,19 @@ export class AuthService {
     }
 
     private updateAdminStatus(user: Utilisateur): void {
-        this.isAdmin.set(user.email === 'admin@biblioapp.fr');
+        this.isAdmin.set(user.type === 'bibliothecaire');
     }
 
-    login(email: string): Observable<Utilisateur> {
+    login(email: string, motDePasse: string): Observable<Utilisateur> {
         if (!email || !email.trim()) {
             return throwError(() => new Error('Email requis'));
         }
 
-        const user = mockUtilisateurs.find(u => u.email === email);
-        if (!user) {
-            return throwError(() => new Error('Utilisateur non trouvé'));
+        if (!motDePasse || !motDePasse.trim()) {
+            return throwError(() => new Error('Mot de passe requis'));
         }
 
-        return of(user).pipe(
-            delay(500),
-            // Since we're using mock data, we can set the user directly after the observable completes
-        );
+        return this.utilisateurService.login(email, motDePasse);
     }
 
     setCurrentUser(user: Utilisateur): void {

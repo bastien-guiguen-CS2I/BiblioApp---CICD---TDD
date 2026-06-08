@@ -2,9 +2,9 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { mockUtilisateurs, mockComptes } from '../../services/mock-data';
-import { Utilisateur, UserType, Enseignant, Etudiant, Particulier } from '../../models/models';
+import { Utilisateur, UserType } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
 
 interface AddUserForm {
     type: UserType;
@@ -13,10 +13,13 @@ interface AddUserForm {
     email: string;
     telephone: string;
     adresse: string;
-    departement: string;
-    annee: number;
-    organisation: string;
-    caution: number;
+    nomDepartement: string;
+    grade: string;
+    anneeUniversitaire: string;
+    numeroEtudiant: string;
+    profession: string;
+    numeroEmploye: string;
+    soldeDisponible: number;
 }
 
 @Component({
@@ -33,26 +36,33 @@ export class AjouterUtilisateurComponent {
         email: '',
         telephone: '',
         adresse: '',
-        departement: '',
-        annee: 1,
-        organisation: '',
-        caution: 100
+        nomDepartement: '',
+        grade: '',
+        anneeUniversitaire: '',
+        numeroEtudiant: '',
+        profession: '',
+        numeroEmploye: '',
+        soldeDisponible: 100
     });
 
     isSubmitting = signal(false);
 
     constructor(
         private router: Router,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private utilisateurService: UtilisateurService
     ) { }
 
     onTypeChange(newType: string): void {
         this.form.update(f => ({
             ...f,
             type: newType as UserType,
-            departement: '',
-            annee: 1,
-            organisation: ''
+            nomDepartement: '',
+            grade: '',
+            anneeUniversitaire: '',
+            numeroEtudiant: '',
+            profession: '',
+            numeroEmploye: ''
         }));
     }
 
@@ -69,14 +79,17 @@ export class AjouterUtilisateurComponent {
             return "L'email est requis";
         }
 
-        if (formValue.type === 'enseignant' && !formValue.departement.trim()) {
+        if (formValue.type === 'enseignant' && !formValue.nomDepartement.trim()) {
             return 'Le département est requis pour un enseignant';
         }
-        if (formValue.type === 'etudiant' && formValue.annee < 1) {
-            return "L'année d'études est requise";
+        if (formValue.type === 'etudiant' && !formValue.numeroEtudiant.trim()) {
+            return "Le numéro étudiant est requis";
         }
-        if (formValue.type === 'particulier' && !formValue.organisation.trim()) {
-            return "L'organisation est requise pour un particulier";
+        if (formValue.type === 'particulier' && !formValue.profession.trim()) {
+            return "La profession est requise pour un particulier";
+        }
+        if (formValue.type === 'bibliothecaire' && !formValue.numeroEmploye.trim()) {
+            return "Le numéro employé est requis pour un bibliothécaire";
         }
 
         return null;
@@ -92,59 +105,20 @@ export class AjouterUtilisateurComponent {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        setTimeout(() => {
-            const newId = `U${Math.random().toString(36).substr(2, 9)}`;
-
-            let newUser: Utilisateur;
-            if (formValue.type === 'enseignant') {
-                newUser = {
-                    id: newId,
-                    type: 'enseignant',
-                    nom: formValue.nom,
-                    prenom: formValue.prenom,
-                    email: formValue.email,
-                    telephone: formValue.telephone,
-                    adresse: formValue.adresse,
-                    departement: formValue.departement
-                } as Enseignant;
-            } else if (formValue.type === 'etudiant') {
-                newUser = {
-                    id: newId,
-                    type: 'etudiant',
-                    nom: formValue.nom,
-                    prenom: formValue.prenom,
-                    email: formValue.email,
-                    telephone: formValue.telephone,
-                    adresse: formValue.adresse,
-                    anneeEtudes: formValue.annee
-                } as Etudiant;
-            } else {
-                newUser = {
-                    id: newId,
-                    type: 'particulier',
-                    nom: formValue.nom,
-                    prenom: formValue.prenom,
-                    email: formValue.email,
-                    telephone: formValue.telephone,
-                    adresse: formValue.adresse,
-                    organisation: formValue.organisation
-                } as Particulier;
-            }
-
-            mockUtilisateurs.push(newUser);
-            mockComptes.push({
-                id: `C${Math.random().toString(36).substr(2, 9)}`,
-                utilisateurId: newId,
-                solde: formValue.caution,
-                dateCreation: new Date().toISOString().split('T')[0]
-            });
-
-            this.isSubmitting.set(false);
-            this.notificationService.success("L'utilisateur a été ajouté avec succès");
-            setTimeout(() => {
+        this.utilisateurService.createUtilisateur({
+            ...formValue,
+            compte: { soldeDisponible: formValue.soldeDisponible }
+        } as any).subscribe({
+            next: () => {
+                this.isSubmitting.set(false);
+                this.notificationService.success("L'utilisateur a été ajouté avec succès");
                 this.router.navigate(['/gestion/utilisateurs']);
-            }, 1000);
-        }, 500);
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+                this.notificationService.error("La création de l'utilisateur a échoué");
+            }
+        });
     }
 
     handleCancel(): void {

@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { DialogService } from '../../services/dialog.service';
-import { mockUtilisateurs } from '../../services/mock-data';
-import { Utilisateur } from '../../models/models';
 
 @Component({
     selector: 'app-login-dialog',
@@ -17,17 +15,12 @@ export class LoginDialogComponent {
     email = '';
     password = 'password123';
     isLoading = signal(false);
-    mockUsers = mockUtilisateurs;
 
     constructor(
         public dialogService: DialogService,
         private authService: AuthService,
         private notificationService: NotificationService
     ) { }
-
-    selectMockUser(user: Utilisateur): void {
-        this.email = user.email;
-    }
 
     handleClose(): void {
         this.dialogService.closeLoginDialog();
@@ -41,8 +34,8 @@ export class LoginDialogComponent {
 
         this.isLoading.set(true);
 
-        this.authService.login(this.email).subscribe({
-            next: (user: Utilisateur) => {
+        this.authService.login(this.email, this.password).subscribe({
+            next: (user) => {
                 this.authService.setCurrentUser(user);
                 this.isLoading.set(false);
                 this.notificationService.success('Connexion réussie');

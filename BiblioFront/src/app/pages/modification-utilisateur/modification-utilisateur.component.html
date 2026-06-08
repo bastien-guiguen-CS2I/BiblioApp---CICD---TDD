@@ -20,10 +20,11 @@
             <div class="inline-block px-3 py-1 rounded-full text-sm font-medium" [ngClass]="{
           'bg-primary/20 text-primary': user()?.type === 'etudiant',
           'bg-green-100 text-green-800': user()?.type === 'enseignant',
-          'bg-purple-100 text-purple-800': user()?.type === 'particulier'
+                    'bg-purple-100 text-purple-800': user()?.type === 'particulier',
+                    'bg-amber-100 text-amber-800': user()?.type === 'bibliothecaire'
         }">
                 {{ user()?.type === 'etudiant' ? 'Étudiant' : user()?.type === 'enseignant' ? 'Enseignant' :
-                'Particulier' }}
+                user()?.type === 'bibliothecaire' ? 'Bibliothécaire' : 'Particulier' }}
             </div>
 
             <!-- Basic Info -->
@@ -64,36 +65,51 @@
 
             <!-- Type-specific fields -->
             <div *ngIf="getType() === 'etudiant'">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Année d'études</label>
-                <select [(ngModel)]="form().annee" [ngModelOptions]="{updateOn: 'change'}" name="annee"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
-                    <option [value]="1">1ère année</option>
-                    <option [value]="2">2e année</option>
-                    <option [value]="3">3e année</option>
-                    <option [value]="4">4e année</option>
-                    <option [value]="5">5e année</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Année universitaire</label>
+                <input type="text" [(ngModel)]="form().anneeUniversitaire" [ngModelOptions]="{updateOn: 'change'}"
+                    name="anneeUniversitaire"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <div *ngIf="getType() === 'etudiant'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Numéro étudiant</label>
+                <input type="text" [(ngModel)]="form().numeroEtudiant" [ngModelOptions]="{updateOn: 'change'}"
+                    name="numeroEtudiant"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
             </div>
 
             <div *ngIf="getType() === 'enseignant'">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Département</label>
-                <input type="text" [(ngModel)]="form().departement" [ngModelOptions]="{updateOn: 'change'}"
-                    name="departement"
+                <input type="text" [(ngModel)]="form().nomDepartement" [ngModelOptions]="{updateOn: 'change'}"
+                    name="nomDepartement"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <div *ngIf="getType() === 'enseignant'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Grade</label>
+                <input type="text" [(ngModel)]="form().grade" [ngModelOptions]="{updateOn: 'change'}" name="grade"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
             </div>
 
             <div *ngIf="getType() === 'particulier'">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Organisation</label>
-                <input type="text" [(ngModel)]="form().organisation" [ngModelOptions]="{updateOn: 'change'}"
-                    name="organisation"
+                <label class="block text-sm font-medium text-gray-700 mb-2">Profession</label>
+                <input type="text" [(ngModel)]="form().profession" [ngModelOptions]="{updateOn: 'change'}"
+                    name="profession"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            </div>
+
+            <div *ngIf="getType() === 'bibliothecaire'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Numéro employé</label>
+                <input type="text" [(ngModel)]="form().numeroEmploye" [ngModelOptions]="{updateOn: 'change'}"
+                    name="numeroEmploye"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
             </div>
 
             <!-- Caution -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Solde caution (€)</label>
-                <input type="number" [(ngModel)]="form().solde" [ngModelOptions]="{updateOn: 'change'}" name="solde"
-                    min="0" step="0.01"
+                <label class="block text-sm font-medium text-gray-700 mb-2">Solde disponible (€)</label>
+                <input type="number" [(ngModel)]="form().soldeDisponible" [ngModelOptions]="{updateOn: 'change'}"
+                    name="soldeDisponible" min="0" step="0.01"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
             </div>
 

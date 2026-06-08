@@ -2,9 +2,9 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { mockUtilisateurs, mockComptes } from '../../services/mock-data';
-import { Utilisateur, UserType, Enseignant, Etudiant, Particulier } from '../../models/models';
+import { Utilisateur, UserType } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
 
 interface ModifyUserForm {
     nom: string;
@@ -12,10 +12,13 @@ interface ModifyUserForm {
     email: string;
     telephone: string;
     adresse: string;
-    departement: string;
-    annee: number;
-    organisation: string;
-    solde: number;
+    nomDepartement: string;
+    grade: string;
+    anneeUniversitaire: string;
+    numeroEtudiant: string;
+    profession: string;
+    numeroEmploye: string;
+    soldeDisponible: number;
 }
 
 @Component({
@@ -35,10 +38,13 @@ export class ModificationUtilisateurComponent implements OnInit {
         email: '',
         telephone: '',
         adresse: '',
-        departement: '',
-        annee: 1,
-        organisation: '',
-        solde: 0
+        nomDepartement: '',
+        grade: '',
+        anneeUniversitaire: '',
+        numeroEtudiant: '',
+        profession: '',
+        numeroEmploye: '',
+        soldeDisponible: 0
     });
 
     isSubmitting = signal(false);
@@ -47,7 +53,8 @@ export class ModificationUtilisateurComponent implements OnInit {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private utilisateurService: UtilisateurService
     ) { }
 
     ngOnInit(): void {
@@ -62,41 +69,48 @@ export class ModificationUtilisateurComponent implements OnInit {
 
     loadUtilisateur(id: string): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            const u = mockUtilisateurs.find(usr => usr.id === id);
-            const c = mockComptes.find(cte => cte.utilisateurId === id);
-
-            if (u) {
-                this.user.set(u);
-                if (c) this.compte.set({ solde: c.solde });
+        this.utilisateurService.getUtilisateurById(id).subscribe({
+            next: utilisateur => {
+                this.user.set(utilisateur);
+                if (utilisateur.compte) {
+                    this.compte.set({ solde: utilisateur.compte.soldeDisponible });
+                }
 
                 const formData: ModifyUserForm = {
-                    nom: u.nom,
-                    prenom: u.prenom,
-                    email: u.email,
-                    telephone: u.telephone || '',
-                    adresse: u.adresse || '',
-                    departement: '',
-                    annee: 1,
-                    organisation: '',
-                    solde: c?.solde || 0
+                    nom: utilisateur.nom,
+                    prenom: utilisateur.prenom,
+                    email: utilisateur.email,
+                    telephone: utilisateur.telephone || '',
+                    adresse: utilisateur.adresse || '',
+                    nomDepartement: '',
+                    grade: '',
+                    anneeUniversitaire: '',
+                    numeroEtudiant: '',
+                    profession: '',
+                    numeroEmploye: '',
+                    soldeDisponible: utilisateur.compte?.soldeDisponible || 0
                 };
 
-                if (u.type === 'enseignant') {
-                    const enseignant = u as Enseignant;
-                    formData.departement = enseignant.departement;
-                } else if (u.type === 'etudiant') {
-                    const etudiant = u as Etudiant;
-                    formData.annee = etudiant.anneeEtudes;
-                } else if (u.type === 'particulier') {
-                    const particulier = u as Particulier;
-                    formData.organisation = particulier.organisation;
+                if (utilisateur.type === 'enseignant') {
+                    formData.nomDepartement = utilisateur.nomDepartement;
+                    formData.grade = utilisateur.grade;
+                } else if (utilisateur.type === 'etudiant') {
+                    formData.anneeUniversitaire = utilisateur.anneeUniversitaire;
+                    formData.numeroEtudiant = utilisateur.numeroEtudiant;
+                } else if (utilisateur.type === 'particulier') {
+                    formData.profession = utilisateur.profession;
+                } else if (utilisateur.type === 'bibliothecaire') {
+                    formData.numeroEmploye = utilisateur.numeroEmploye;
                 }
 
                 this.form.set(formData);
+                this.isLoading.set(false);
+            },
+            error: () => {
+                this.notificationService.error('Utilisateur non trouvé');
+                this.isLoading.set(false);
             }
-            this.isLoading.set(false);
-        }, 300);
+        });
     }
 
     getType(): UserType | null {
@@ -132,41 +146,25 @@ export class ModificationUtilisateurComponent implements OnInit {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        setTimeout(() => {
-            const index = mockUtilisateurs.findIndex(usr => usr.id === u.id);
-            if (index >= 0) {
-                const updated: Utilisateur = {
-                    ...u,
-                    nom: formValue.nom,
-                    prenom: formValue.prenom,
-                    email: formValue.email,
-                    telephone: formValue.telephone,
-                    adresse: formValue.adresse
-                };
-
-                if (u.type === 'enseignant') {
-                    (updated as Enseignant).departement = formValue.departement;
-                } else if (u.type === 'etudiant') {
-                    (updated as Etudiant).anneeEtudes = formValue.annee;
-                } else if (u.type === 'particulier') {
-                    (updated as Particulier).organisation = formValue.organisation;
-                }
-
-                mockUtilisateurs[index] = updated;
-            }
-
-            // Update compte solde
-            const compteIndex = mockComptes.findIndex(c => c.utilisateurId === u.id);
-            if (compteIndex >= 0) {
-                mockComptes[compteIndex].solde = formValue.solde;
-            }
-
-            this.isSubmitting.set(false);
-            this.notificationService.success("L'utilisateur a été modifié avec succès");
-            setTimeout(() => {
+        this.utilisateurService.updateUtilisateur(u.id, {
+            ...u,
+            nom: formValue.nom,
+            prenom: formValue.prenom,
+            email: formValue.email,
+            telephone: formValue.telephone,
+            adresse: formValue.adresse,
+            compte: { soldeDisponible: formValue.soldeDisponible }
+        } as any).subscribe({
+            next: () => {
+                this.isSubmitting.set(false);
+                this.notificationService.success("L'utilisateur a été modifié avec succès");
                 this.router.navigate(['/gestion/utilisateurs']);
-            }, 1000);
-        }, 500);
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+                this.notificationService.error("La modification de l'utilisateur a échoué");
+            }
+        });
     }
 
     handleCancel(): void {

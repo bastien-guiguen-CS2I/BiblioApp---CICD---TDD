@@ -1,94 +1,9 @@
 import {
-    Utilisateur,
-    Compte,
     Ressource,
     Exemplaire,
     Emplacement,
     Emprunt
 } from '../models/models';
-
-export const mockUtilisateurs: Utilisateur[] = [
-    {
-        id: 'u1',
-        nom: 'Dupont',
-        prenom: 'Jean',
-        email: 'jean.dupont@univ.fr',
-        telephone: '+33 1 23 45 67 89',
-        adresse: '1 rue de la Paix, Paris',
-        type: 'enseignant',
-        departement: 'Informatique'
-    },
-    {
-        id: 'u2',
-        nom: 'Martin',
-        prenom: 'Sophie',
-        email: 'sophie.martin@etu.univ.fr',
-        telephone: '+33 6 12 34 56 78',
-        adresse: '12 avenue des Champs, Paris',
-        type: 'etudiant',
-        anneeEtudes: 3
-    },
-    {
-        id: 'u3',
-        nom: 'Bernard',
-        prenom: 'Luc',
-        email: 'luc.bernard@gmail.com',
-        telephone: '+33 1 98 76 54 32',
-        adresse: '5 boulevard Voltaire, Paris',
-        type: 'particulier',
-        organisation: 'Bibliothèque Libre'
-    },
-    {
-        id: 'u4',
-        nom: 'Lefebvre',
-        prenom: 'Marie',
-        email: 'marie.lefebvre@univ.fr',
-        telephone: '+33 1 45 67 89 01',
-        adresse: '8 rue Lafayette, Paris',
-        type: 'enseignant',
-        departement: 'Histoire'
-    },
-    {
-        id: 'u5',
-        nom: 'Petit',
-        prenom: 'Thomas',
-        email: 'thomas.petit@etu.univ.fr',
-        telephone: '+33 6 98 76 54 32',
-        adresse: '22 rue du Commerce, Paris',
-        type: 'etudiant',
-        anneeEtudes: 1
-    },
-    {
-        id: 'u6',
-        nom: 'Garcia',
-        prenom: 'Aurora',
-        email: 'aurora.garcia@univ.fr',
-        telephone: '+33 1 15 26 37 48',
-        adresse: '95 rue de Rivoli, Paris',
-        type: 'enseignant',
-        departement: 'Littérature'
-    },
-    {
-        id: 'u7',
-        nom: 'Durand',
-        prenom: 'Alice',
-        email: 'admin@biblioapp.fr',
-        telephone: '+33 1 40 51 75 85',
-        adresse: 'Bibliothèque Universitaire, 123 Rue de la Sorbonne, Paris',
-        type: 'bibliothecaire',
-        numeroEmploye: 'Université Paris-Sorbonne'
-    }
-];
-
-export const mockComptes: Compte[] = [
-    { id: 'c1', utilisateurId: 'u1', solde: 150, dateCreation: '2023-01-10' },
-    { id: 'c2', utilisateurId: 'u2', solde: 50, dateCreation: '2023-02-15' },
-    { id: 'c3', utilisateurId: 'u3', solde: 100, dateCreation: '2023-03-20' },
-    { id: 'c4', utilisateurId: 'u4', solde: 200, dateCreation: '2023-01-05' },
-    { id: 'c5', utilisateurId: 'u5', solde: 20, dateCreation: '2023-09-01' },
-    { id: 'c6', utilisateurId: 'u6', solde: 180, dateCreation: '2023-01-15' },
-    { id: 'c7', utilisateurId: 'u7', solde: 0, dateCreation: '2023-01-01' }
-];
 
 export const mockEmplacements: Emplacement[] = [
     {

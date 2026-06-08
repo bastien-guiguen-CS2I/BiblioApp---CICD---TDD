@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { mockEmprunts, mockUtilisateurs, mockExemplaires, mockRessources } from '../../services/mock-data';
+import { mockEmprunts, mockExemplaires, mockRessources } from '../../services/mock-data';
 import { Emprunt, Ressource } from '../../models/models';
 
 @Component({

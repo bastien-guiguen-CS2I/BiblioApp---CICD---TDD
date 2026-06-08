@@ -44,17 +44,6 @@
                     {{ isLoading() ? 'Connexion en cours...' : 'Se connecter' }}
                 </button>
             </form>
-
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <p class="text-sm text-gray-600 mb-4 font-medium">Comptes de test (Mock)</p>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    <div *ngFor="let user of mockUsers"
-                        class="text-xs text-gray-500 p-2 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
-                        (click)="selectMockUser(user)">
-                        <strong>{{ user.email }}</strong> - {{ user.prenom }} {{ user.nom }}
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

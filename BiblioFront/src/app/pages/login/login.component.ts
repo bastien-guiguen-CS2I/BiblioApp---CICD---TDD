@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { mockUtilisateurs } from '../../services/mock-data';
-import { Utilisateur } from '../../models/models';
 
 @Component({
     selector: 'app-login',
@@ -17,17 +15,12 @@ export class LoginComponent {
     email = '';
     password = 'password123';
     isLoading = signal(false);
-    mockUsers = mockUtilisateurs;
 
     constructor(
         private router: Router,
         private authService: AuthService,
         private notificationService: NotificationService
     ) { }
-
-    selectMockUser(user: Utilisateur): void {
-        this.email = user.email;
-    }
 
     handleClose(): void {
         this.router.navigate(['/catalogue']);
@@ -41,8 +34,8 @@ export class LoginComponent {
 
         this.isLoading.set(true);
 
-        this.authService.login(this.email).subscribe({
-            next: (user: Utilisateur) => {
+        this.authService.login(this.email, this.password).subscribe({
+            next: (user) => {
                 this.authService.setCurrentUser(user);
                 this.isLoading.set(false);
                 this.notificationService.success('Connexion réussie');

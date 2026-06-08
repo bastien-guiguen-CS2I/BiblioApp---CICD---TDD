@@ -2,10 +2,10 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { mockUtilisateurs, mockComptes } from '../../services/mock-data';
-import { Utilisateur, Compte, Enseignant, Etudiant } from '../../models/models';
+import { Utilisateur, Enseignant, Etudiant } from '../../models/models';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 import { NotificationService } from '../../services/notification.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
 
 @Component({
     selector: 'app-gestion-utilisateur',
@@ -20,7 +20,8 @@ export class GestionUtilisateurComponent implements OnInit {
 
     constructor(
         private confirmDialogService: ConfirmDialogService,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private utilisateurService: UtilisateurService
     ) { }
 
     ngOnInit(): void {
@@ -30,11 +31,14 @@ export class GestionUtilisateurComponent implements OnInit {
     getTypeDetails(user: Utilisateur): string {
         if (user.type === 'enseignant') {
             const enseignant = user as Enseignant;
-            return enseignant.departement;
+            return `${enseignant.nomDepartement} - ${enseignant.grade}`;
         }
         if (user.type === 'etudiant') {
             const etudiant = user as Etudiant;
-            return `Année ${etudiant.anneeEtudes}`;
+            return `${etudiant.anneeUniversitaire} - ${etudiant.numeroEtudiant}`;
+        }
+        if (user.type === 'bibliothecaire') {
+            return `Employé ${user.numeroEmploye}`;
         }
         return '-';
     }
@@ -47,16 +51,18 @@ export class GestionUtilisateurComponent implements OnInit {
         );
     };
 
-    getCompte(userId: string): Compte | undefined {
-        return mockComptes.find(c => c.utilisateurId === userId);
-    }
-
     fetchUtilisateurs(): void {
         this.isLoading.set(true);
-        setTimeout(() => {
-            this.utilisateurs.set(mockUtilisateurs);
-            this.isLoading.set(false);
-        }, 300);
+        this.utilisateurService.getAllUtilisateurs().subscribe({
+            next: utilisateurs => {
+                this.utilisateurs.set(utilisateurs);
+                this.isLoading.set(false);
+            },
+            error: () => {
+                this.notificationService.error('Impossible de charger les utilisateurs');
+                this.isLoading.set(false);
+            }
+        });
     }
 
     handleDelete(id: string): void {
@@ -68,10 +74,13 @@ export class GestionUtilisateurComponent implements OnInit {
             isDestructive: true
         }).subscribe(result => {
             if (result) {
-                this.utilisateurs.update(users =>
-                    users.filter(u => u.id !== id)
-                );
-                this.notificationService.success("L'utilisateur a été supprimé");
+                this.utilisateurService.deleteUtilisateur(id).subscribe({
+                    next: () => {
+                        this.utilisateurs.update(users => users.filter(u => u.id !== id));
+                        this.notificationService.success("L'utilisateur a été supprimé");
+                    },
+                    error: () => this.notificationService.error('Suppression impossible')
+                });
             }
         });
     }

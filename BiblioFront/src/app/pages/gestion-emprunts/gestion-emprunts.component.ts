@@ -1,9 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { mockEmprunts, mockUtilisateurs, mockExemplaires, mockRessources } from '../../services/mock-data';
+import { mockEmprunts, mockExemplaires, mockRessources } from '../../services/mock-data';
 import { Emprunt } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
+import { Utilisateur } from '../../models/models';
 
 @Component({
     selector: 'app-gestion-emprunts',
@@ -13,15 +15,20 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class GestionEmpruntsComponent implements OnInit {
     emprunts = signal<Emprunt[]>([]);
+    utilisateurs = signal<Utilisateur[]>([]);
     search = '';
     activeTab = signal<'tous' | 'retards'>('tous');
     isLoading = signal(true);
     isSending = signal(false);
 
-    constructor(private notificationService: NotificationService) { }
+    constructor(
+        private notificationService: NotificationService,
+        private utilisateurService: UtilisateurService
+    ) { }
 
     ngOnInit(): void {
         this.fetchEmprunts();
+        this.fetchUtilisateurs();
     }
 
     filteredEmprunts = (): Emprunt[] => {
@@ -54,7 +61,7 @@ export class GestionEmpruntsComponent implements OnInit {
     }
 
     getUtilisateur(userId: string) {
-        return mockUtilisateurs.find(u => u.id === userId);
+        return this.utilisateurs().find(u => u.id === userId);
     }
 
     getRessource(exemplaireId: string) {
@@ -73,6 +80,13 @@ export class GestionEmpruntsComponent implements OnInit {
             this.emprunts.set(mockEmprunts);
             this.isLoading.set(false);
         }, 300);
+    }
+
+    fetchUtilisateurs(): void {
+        this.utilisateurService.getAllUtilisateurs().subscribe({
+            next: utilisateurs => this.utilisateurs.set(utilisateurs),
+            error: () => this.notificationService.error('Impossible de charger les utilisateurs')
+        });
     }
 
     handleRetour(id: string): void {

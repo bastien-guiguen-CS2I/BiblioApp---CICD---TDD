@@ -21,24 +21,29 @@ export interface BaseUser {
     nom: string;
     prenom: string;
     email: string;
+    motDePasse?: string;
+    dateInscription?: string;
     type: UserType;
     telephone?: string;
     adresse?: string;
+    compte?: CompteUtilisateur;
 }
 
 export interface Enseignant extends BaseUser {
     type: 'enseignant';
-    departement: string;
+    nomDepartement: string;
+    grade: string;
 }
 
 export interface Etudiant extends BaseUser {
     type: 'etudiant';
-    anneeEtudes: number;
+    anneeUniversitaire: string;
+    numeroEtudiant: string;
 }
 
 export interface Particulier extends BaseUser {
     type: 'particulier';
-    organisation: string;
+    profession: string;
 }
 
 export interface Bibliothecaire extends BaseUser {
@@ -47,6 +52,11 @@ export interface Bibliothecaire extends BaseUser {
 }
 
 export type Utilisateur = Enseignant | Etudiant | Particulier | Bibliothecaire;
+
+export interface CompteUtilisateur {
+    id?: string | number;
+    soldeDisponible: number;
+}
 
 export interface BaseRessource {
     id: number | string;
