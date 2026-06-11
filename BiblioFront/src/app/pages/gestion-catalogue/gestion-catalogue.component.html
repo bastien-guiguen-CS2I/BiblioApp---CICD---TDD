@@ -26,9 +26,10 @@
             </div>
         </div>
 
-        <div *ngIf="isLoading()" class="p-8 lg:p-12 text-center text-gray-500">Chargement...</div>
-
-        <div *ngIf="!isLoading()" class="overflow-x-auto">
+        @if (isLoading()) {
+        <div class="p-8 lg:p-12 text-center text-gray-500">Chargement...</div>
+        } @else {
+        <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -50,11 +51,13 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr *ngFor="let resource of filteredRessources()" class="hover:bg-gray-50 transition">
+                    @for (resource of filteredRessources(); track resource.id) {
+                    <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 lg:px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <span [class]="'px-3 py-1 rounded text-xs font-semibold ' +
-                  (resource.type === 'livre' ? 'bg-primary/20 text-primary' : 'bg-purple-100 text-purple-800')">
+                                <span
+                                    [class]="'px-3 py-1 rounded text-xs font-semibold ' +
+                                    (resource.type === 'livre' ? 'bg-primary/20 text-primary' : 'bg-purple-100 text-purple-800')">
                                     {{ resource.type === 'livre' ? 'Livre' : 'Revue' }}
                                 </span>
                                 <span class="text-sm font-medium text-gray-900 truncate">{{ resource.titre }}</span>
@@ -89,8 +92,10 @@
                             </div>
                         </td>
                     </tr>
+                    }
                 </tbody>
             </table>
         </div>
+        }
     </div>
 </div>

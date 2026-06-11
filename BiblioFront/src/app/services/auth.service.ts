@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { UtilisateurService } from './utilisateur.service';
@@ -8,14 +8,14 @@ import { Utilisateur } from '../models/models';
     providedIn: 'root'
 })
 export class AuthService {
+    private readonly router = inject(Router);
+    private readonly utilisateurService = inject(UtilisateurService);
+
     currentUser = signal<Utilisateur | null>(null);
     isAuthenticated = signal(false);
     isAdmin = signal(false);
 
-    constructor(
-        private router: Router,
-        private utilisateurService: UtilisateurService
-    ) {
+    constructor() {
         this.loadUserFromStorage();
     }
 
@@ -41,11 +41,9 @@ export class AuthService {
         if (!email || !email.trim()) {
             return throwError(() => new Error('Email requis'));
         }
-
         if (!motDePasse || !motDePasse.trim()) {
             return throwError(() => new Error('Mot de passe requis'));
         }
-
         return this.utilisateurService.login(email, motDePasse);
     }
 

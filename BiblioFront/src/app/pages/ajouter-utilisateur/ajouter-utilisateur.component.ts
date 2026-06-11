@@ -1,8 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Utilisateur, UserType } from '../../models/models';
+import { UserType, Utilisateur } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
 import { UtilisateurService } from '../../services/utilisateur.service';
 
@@ -29,6 +29,10 @@ interface AddUserForm {
     templateUrl: './ajouter-utilisateur.component.html'
 })
 export class AjouterUtilisateurComponent {
+    private readonly router = inject(Router);
+    private readonly notificationService = inject(NotificationService);
+    private readonly utilisateurService = inject(UtilisateurService);
+
     form = signal<AddUserForm>({
         type: 'etudiant',
         nom: '',
@@ -47,12 +51,6 @@ export class AjouterUtilisateurComponent {
 
     isSubmitting = signal(false);
 
-    constructor(
-        private router: Router,
-        private notificationService: NotificationService,
-        private utilisateurService: UtilisateurService
-    ) { }
-
     onTypeChange(newType: string): void {
         this.form.update(f => ({
             ...f,
@@ -68,30 +66,13 @@ export class AjouterUtilisateurComponent {
 
     private validateForm(): string | null {
         const formValue = this.form();
-
-        if (!formValue.nom.trim()) {
-            return 'Le nom est requis';
-        }
-        if (!formValue.prenom.trim()) {
-            return 'Le prénom est requis';
-        }
-        if (!formValue.email.trim()) {
-            return "L'email est requis";
-        }
-
-        if (formValue.type === 'enseignant' && !formValue.nomDepartement.trim()) {
-            return 'Le département est requis pour un enseignant';
-        }
-        if (formValue.type === 'etudiant' && !formValue.numeroEtudiant.trim()) {
-            return "Le numéro étudiant est requis";
-        }
-        if (formValue.type === 'particulier' && !formValue.profession.trim()) {
-            return "La profession est requise pour un particulier";
-        }
-        if (formValue.type === 'bibliothecaire' && !formValue.numeroEmploye.trim()) {
-            return "Le numéro employé est requis pour un bibliothécaire";
-        }
-
+        if (!formValue.nom.trim()) return 'Le nom est requis';
+        if (!formValue.prenom.trim()) return 'Le prénom est requis';
+        if (!formValue.email.trim()) return "L'email est requis";
+        if (formValue.type === 'enseignant' && !formValue.nomDepartement.trim()) return 'Le département est requis pour un enseignant';
+        if (formValue.type === 'etudiant' && !formValue.numeroEtudiant.trim()) return "Le numéro étudiant est requis";
+        if (formValue.type === 'particulier' && !formValue.profession.trim()) return "La profession est requise pour un particulier";
+        if (formValue.type === 'bibliothecaire' && !formValue.numeroEmploye.trim()) return "Le numéro employé est requis pour un bibliothécaire";
         return null;
     }
 
@@ -105,10 +86,12 @@ export class AjouterUtilisateurComponent {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        this.utilisateurService.createUtilisateur({
+        const payload: Omit<Utilisateur, 'id'> = {
             ...formValue,
             compte: { soldeDisponible: formValue.soldeDisponible }
-        } as any).subscribe({
+        } as Omit<Utilisateur, 'id'>;
+
+        this.utilisateurService.createUtilisateur(payload as Utilisateur).subscribe({
             next: () => {
                 this.isSubmitting.set(false);
                 this.notificationService.success("L'utilisateur a été ajouté avec succès");

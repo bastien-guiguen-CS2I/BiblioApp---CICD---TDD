@@ -1,14 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import {
-    Bibliothecaire,
-    CompteUtilisateur,
-    Enseignant,
-    Etudiant,
-    Particulier,
-    Utilisateur
-} from '../models/models';
+import { CompteUtilisateur, Utilisateur } from '../models/models';
 
 interface ApiCompteUtilisateur {
     id: number;
@@ -55,9 +48,8 @@ type ApiUtilisateur = ApiEnseignant | ApiEtudiant | ApiParticulier | ApiBiblioth
     providedIn: 'root'
 })
 export class UtilisateurService {
+    private readonly http = inject(HttpClient);
     private readonly apiUrl = '/api/utilisateurs';
-
-    constructor(private http: HttpClient) { }
 
     getAllUtilisateurs(): Observable<Utilisateur[]> {
         return this.http.get<ApiUtilisateur[]>(this.apiUrl).pipe(
@@ -83,13 +75,13 @@ export class UtilisateurService {
         );
     }
 
-    createUtilisateur(utilisateur: any): Observable<Utilisateur> {
+    createUtilisateur(utilisateur: Utilisateur): Observable<Utilisateur> {
         return this.http.post<ApiUtilisateur>(this.apiUrl, this.toApiPayload(utilisateur, true)).pipe(
             map(user => this.toFrontendUser(user))
         );
     }
 
-    updateUtilisateur(id: string | number, utilisateur: any): Observable<Utilisateur> {
+    updateUtilisateur(id: string | number, utilisateur: Utilisateur): Observable<Utilisateur> {
         return this.http.put<ApiUtilisateur>(`${this.apiUrl}/${this.toApiId(id)}`, this.toApiPayload(utilisateur, false)).pipe(
             map(user => this.toFrontendUser(user))
         );
@@ -100,10 +92,7 @@ export class UtilisateurService {
     }
 
     private toApiId(id: string | number): number {
-        if (typeof id === 'number') {
-            return id;
-        }
-
+        if (typeof id === 'number') return id;
         const normalized = id.replace(/^u/i, '');
         return Number.parseInt(normalized, 10);
     }
@@ -113,10 +102,7 @@ export class UtilisateurService {
     }
 
     private toFrontendCompte(compte?: ApiCompteUtilisateur): CompteUtilisateur | undefined {
-        if (!compte) {
-            return undefined;
-        }
-
+        if (!compte) return undefined;
         return {
             id: `c${compte.id}`,
             soldeDisponible: compte.soldeDisponible
@@ -137,35 +123,17 @@ export class UtilisateurService {
 
         switch (user.type) {
             case 'enseignant':
-                return {
-                    ...base,
-                    type: 'enseignant',
-                    nomDepartement: user.nomDepartement ?? '',
-                    grade: user.grade ?? ''
-                };
+                return { ...base, type: 'enseignant', nomDepartement: user.nomDepartement ?? '', grade: user.grade ?? '' };
             case 'etudiant':
-                return {
-                    ...base,
-                    type: 'etudiant',
-                    anneeUniversitaire: user.anneeUniversitaire ?? '',
-                    numeroEtudiant: user.numeroEtudiant ?? ''
-                };
+                return { ...base, type: 'etudiant', anneeUniversitaire: user.anneeUniversitaire ?? '', numeroEtudiant: user.numeroEtudiant ?? '' };
             case 'particulier':
-                return {
-                    ...base,
-                    type: 'particulier',
-                    profession: user.profession ?? ''
-                };
+                return { ...base, type: 'particulier', profession: user.profession ?? '' };
             case 'bibliothecaire':
-                return {
-                    ...base,
-                    type: 'bibliothecaire',
-                    numeroEmploye: user.numeroEmploye ?? ''
-                };
+                return { ...base, type: 'bibliothecaire', numeroEmploye: user.numeroEmploye ?? '' };
         }
     }
 
-    private toApiPayload(utilisateur: any, isCreate: boolean): Record<string, unknown> {
+    private toApiPayload(utilisateur: Utilisateur, isCreate: boolean): Record<string, unknown> {
         const payload: Record<string, unknown> = {
             type: utilisateur.type,
             nom: utilisateur.nom,
@@ -174,7 +142,7 @@ export class UtilisateurService {
             telephone: utilisateur.telephone,
             adresse: utilisateur.adresse,
             dateInscription: utilisateur.dateInscription,
-            motDePasse: isCreate ? (utilisateur.motDePasse ?? 'password123') : '',
+            motDePasse: isCreate ? ('motDePasse' in utilisateur ? (utilisateur as Utilisateur & { motDePasse?: string }).motDePasse ?? 'password123' : 'password123') : '',
             compte: utilisateur.compte
                 ? {
                     ...(utilisateur.compte.id ? { id: this.toApiId(utilisateur.compte.id) } : {}),
@@ -186,18 +154,12 @@ export class UtilisateurService {
         if (utilisateur.type === 'enseignant') {
             payload['nomDepartement'] = utilisateur.nomDepartement;
             payload['grade'] = utilisateur.grade;
-        }
-
-        if (utilisateur.type === 'etudiant') {
+        } else if (utilisateur.type === 'etudiant') {
             payload['anneeUniversitaire'] = utilisateur.anneeUniversitaire;
             payload['numeroEtudiant'] = utilisateur.numeroEtudiant;
-        }
-
-        if (utilisateur.type === 'particulier') {
+        } else if (utilisateur.type === 'particulier') {
             payload['profession'] = utilisateur.profession;
-        }
-
-        if (utilisateur.type === 'bibliothecaire') {
+        } else if (utilisateur.type === 'bibliothecaire') {
             payload['numeroEmploye'] = utilisateur.numeroEmploye;
         }
 

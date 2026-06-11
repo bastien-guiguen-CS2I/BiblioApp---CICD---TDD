@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 
@@ -9,8 +9,7 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
     templateUrl: './confirm-dialog.component.html'
 })
 export class ConfirmDialogComponent {
+    protected readonly dialogService = inject(ConfirmDialogService);
     isOpen = computed(() => this.dialogService.isOpen$());
     options = computed(() => this.dialogService.options$());
-
-    constructor(public dialogService: ConfirmDialogService) { }
 }

@@ -18,8 +18,6 @@ export class NotificationService {
     public notifications$ = computed(() => this.notifications());
     private idCounter = 0;
 
-    constructor() { }
-
     show(message: string, type: NotificationType = 'info', duration = 3000): void {
         const notification: Notification = {
             id: `notification-${++this.idCounter}`,
@@ -28,9 +26,7 @@ export class NotificationService {
             duration,
             timestamp: Date.now()
         };
-
         this.notifications.update(notifs => [...notifs, notification]);
-
         if (duration > 0) {
             setTimeout(() => this.remove(notification.id), duration);
         }

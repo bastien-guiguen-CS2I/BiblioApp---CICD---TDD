@@ -7,7 +7,9 @@
             <div class="flex items-center gap-3">
                 <div>
                     <h1 class="font-bold text-lg">BiblioApp</h1>
-                    <p class="text-xs text-slate-400" *ngIf="currentUser()">{{ currentUser()?.type | titlecase }}</p>
+                    @if (currentUser()) {
+                    <p class="text-xs text-slate-400">{{ currentUser()?.type | titlecase }}</p>
+                    }
                 </div>
             </div>
         </div>
@@ -15,7 +17,8 @@
         <!-- Navigation Menu -->
         <nav class="mt-8 space-y-1 px-4">
             <!-- Admin Navigation -->
-            <div *ngIf="isAdmin()" class="space-y-1">
+            @if (isAdmin()) {
+            <div class="space-y-1">
                 <p class="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Admin</p>
                 <a routerLink="/catalogue" (click)="closeMobileMenu()"
                     routerLinkActive="bg-primary/20 border-l-4 border-primary" [routerLinkActiveOptions]="{exact: true}"
@@ -45,9 +48,9 @@
                     <span class="inline-block mr-3"></span>Emprunts
                 </a>
             </div>
-
+            } @else {
             <!-- User Navigation -->
-            <div *ngIf="!isAdmin()" class="space-y-1">
+            <div class="space-y-1">
                 <p class="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</p>
                 <a routerLink="/catalogue" (click)="closeMobileMenu()"
                     routerLinkActive="bg-primary/20 border-l-4 border-primary" [routerLinkActiveOptions]="{exact: true}"
@@ -55,19 +58,22 @@
                     aria-label="Catalogue">
                     <span class="inline-block mr-3"></span>Catalogue
                 </a>
-                <a *ngIf="currentUser()" routerLink="/mes-emprunts" (click)="closeMobileMenu()"
+                @if (currentUser()) {
+                <a routerLink="/mes-emprunts" (click)="closeMobileMenu()"
                     routerLinkActive="bg-primary/20 border-l-4 border-primary"
                     [routerLinkActiveOptions]="{exact: false}"
                     class="block px-4 py-3 rounded-lg hover:bg-slate-700/50 transition text-sm border-l-4 border-transparent"
                     aria-label="Mes Emprunts">
                     <span class="inline-block mr-3"></span>Mes Emprunts
                 </a>
+                }
             </div>
+            }
         </nav>
 
         <!-- User Info Section - Logged In -->
-        <div *ngIf="currentUser()"
-            class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 bg-slate-900/50">
+        @if (currentUser()) {
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 bg-slate-900/50">
             <div class="flex items-center gap-3 mb-4">
                 <div class="w-10 h-10 bg-primary/100 rounded-full flex items-center justify-center text-white font-semibold"
                     [title]="'Initiales de ' + getCurrentUserName()">
@@ -89,10 +95,9 @@
                 Déconnexion
             </button>
         </div>
-
+        } @else {
         <!-- User Info Section - Not Logged In -->
-        <div *ngIf="!currentUser()"
-            class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 bg-slate-900/50">
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700 bg-slate-900/50">
             <button (click)="openLoginDialog(); closeMobileMenu()"
                 class="w-full px-3 py-2 bg-primary text-white rounded-lg text-sm hover:bg-blue-700 transition font-medium flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,6 +107,7 @@
                 Connexion
             </button>
         </div>
+        }
     </div>
 
     <!-- Main Content -->
@@ -110,14 +116,15 @@
         <div
             class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
             <button (click)="toggleMobileMenu()" class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition">
-                <svg *ngIf="!isMobileMenuOpen()" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                @if (!isMobileMenuOpen()) {
+                <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <svg *ngIf="isMobileMenuOpen()" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                } @else {
+                <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
+                }
             </button>
             <div class="text-gray-600 text-sm font-medium">
                 {{ getCurrentDate() | date:'d MMMM yyyy' }}
@@ -136,5 +143,9 @@
     </div>
 
     <!-- Mobile Menu Overlay -->
-    <div *ngIf="isMobileMenuOpen()" class="fixed inset-0 bg-black/50 md:hidden z-40" (click)="closeMobileMenu()"></div>
+    @if (isMobileMenuOpen()) {
+    <div class="fixed inset-0 bg-black/50 md:hidden z-40" (click)="closeMobileMenu()" (keyup.escape)="closeMobileMenu()"
+        tabindex="0" role="button" aria-label="Fermer le menu">
+    </div>
+    }
 </div>

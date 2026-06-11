@@ -1,4 +1,4 @@
-<button [type]="type" [class]="getButtonClasses()" [disabled]="disabled || isLoading" (click)="onClick.emit()"
+<button [type]="type" [class]="getButtonClasses()" [disabled]="disabled || isLoading" (click)="clicked.emit()"
     [attr.aria-label]="ariaLabel">
     <span class="flex items-center justify-center gap-2">
         @if (isLoading) {

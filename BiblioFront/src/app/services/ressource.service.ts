@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Ressource } from '../models/models';
@@ -7,9 +7,8 @@ import { Ressource } from '../models/models';
     providedIn: 'root'
 })
 export class RessourceService {
+    private readonly http = inject(HttpClient);
     private readonly apiUrl = '/api/ressources';
-
-    constructor(private http: HttpClient) { }
 
     getAllRessources(): Observable<Ressource[]> {
         return this.http.get<Ressource[]>(this.apiUrl);
@@ -31,4 +30,3 @@ export class RessourceService {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 }
-

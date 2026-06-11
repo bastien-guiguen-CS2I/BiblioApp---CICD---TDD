@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Utilisateur, Enseignant, Etudiant } from '../../models/models';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 import { NotificationService } from '../../services/notification.service';
@@ -14,15 +14,13 @@ import { UtilisateurService } from '../../services/utilisateur.service';
     templateUrl: './gestion-utilisateur.component.html'
 })
 export class GestionUtilisateurComponent implements OnInit {
+    private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly notificationService = inject(NotificationService);
+    private readonly utilisateurService = inject(UtilisateurService);
+
     utilisateurs = signal<Utilisateur[]>([]);
     search = '';
     isLoading = signal(true);
-
-    constructor(
-        private confirmDialogService: ConfirmDialogService,
-        private notificationService: NotificationService,
-        private utilisateurService: UtilisateurService
-    ) { }
 
     ngOnInit(): void {
         this.fetchUtilisateurs();

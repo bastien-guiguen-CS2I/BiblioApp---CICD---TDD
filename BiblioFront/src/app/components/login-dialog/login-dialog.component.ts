@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -12,15 +12,13 @@ import { DialogService } from '../../services/dialog.service';
     templateUrl: './login-dialog.component.html'
 })
 export class LoginDialogComponent {
+    protected readonly dialogService = inject(DialogService);
+    private readonly authService = inject(AuthService);
+    private readonly notificationService = inject(NotificationService);
+
     email = '';
     password = 'password123';
     isLoading = signal(false);
-
-    constructor(
-        public dialogService: DialogService,
-        private authService: AuthService,
-        private notificationService: NotificationService
-    ) { }
 
     handleClose(): void {
         this.dialogService.closeLoginDialog();
@@ -31,9 +29,7 @@ export class LoginDialogComponent {
             this.notificationService.error('Veuillez saisir votre email');
             return;
         }
-
         this.isLoading.set(true);
-
         this.authService.login(this.email, this.password).subscribe({
             next: (user) => {
                 this.authService.setCurrentUser(user);

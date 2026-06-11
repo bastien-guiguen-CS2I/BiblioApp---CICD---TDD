@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Livre, Revue } from '../../models/models';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
@@ -15,15 +15,13 @@ import { RessourceService } from '../../services/ressource.service';
     templateUrl: './gestion-catalogue.component.html'
 })
 export class GestionCatalogueComponent implements OnInit {
+    private readonly ressourceService = inject(RessourceService);
+    private readonly confirmDialogService = inject(ConfirmDialogService);
+    private readonly notificationService = inject(NotificationService);
+
     ressources = signal<Ressource[]>([]);
     search = '';
     isLoading = signal(true);
-
-    constructor(
-        private ressourceService: RessourceService,
-        private confirmDialogService: ConfirmDialogService,
-        private notificationService: NotificationService
-    ) { }
 
     ngOnInit(): void {
         this.fetchRessources();
@@ -31,11 +29,9 @@ export class GestionCatalogueComponent implements OnInit {
 
     getAuthorOrVolume(resource: Ressource): string {
         if (resource.type === 'livre') {
-            const livre = resource as Livre;
-            return livre.auteur;
+            return (resource as Livre).auteur;
         }
-        const revue = resource as Revue;
-        return `Vol. ${revue.numeroVolume}`;
+        return `Vol. ${(resource as Revue).numeroVolume}`;
     }
 
     filteredRessources = (): Ressource[] => {
@@ -55,7 +51,7 @@ export class GestionCatalogueComponent implements OnInit {
                 this.ressources.set(ressources);
                 this.isLoading.set(false);
             },
-            error: (err) => {
+            error: (err: Error) => {
                 console.error('Erreur lors du chargement des ressources', err);
                 this.isLoading.set(false);
             }
@@ -73,12 +69,10 @@ export class GestionCatalogueComponent implements OnInit {
             if (result) {
                 this.ressourceService.deleteRessource(id).subscribe({
                     next: () => {
-                        this.ressources.update(res =>
-                            res.filter(r => r.id !== id)
-                        );
+                        this.ressources.update(res => res.filter(r => r.id !== id));
                         this.notificationService.success('Ressource supprimée avec succès');
                     },
-                    error: (err) => {
+                    error: (err: Error) => {
                         console.error('Erreur lors de la suppression', err);
                         this.notificationService.error('Erreur lors de la suppression de la ressource');
                     }

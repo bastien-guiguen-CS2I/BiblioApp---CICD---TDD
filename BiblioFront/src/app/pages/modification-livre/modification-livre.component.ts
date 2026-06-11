@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -24,6 +24,11 @@ interface ModifyResourceForm {
     templateUrl: './modification-livre.component.html'
 })
 export class ModificationLivreComponent implements OnInit {
+    private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
+    private readonly ressourceService = inject(RessourceService);
+    private readonly notificationService = inject(NotificationService);
+
     resourceId = signal<string>('');
     resource = signal<Ressource | null>(null);
     exemplairesCount = signal(0);
@@ -40,13 +45,6 @@ export class ModificationLivreComponent implements OnInit {
 
     isSubmitting = signal(false);
     isLoading = signal(true);
-
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private ressourceService: RessourceService,
-        private notificationService: NotificationService
-    ) { }
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
@@ -90,20 +88,10 @@ export class ModificationLivreComponent implements OnInit {
     private validateForm(): string | null {
         const formValue = this.form();
         const res = this.resource();
-
-        if (!formValue.titre.trim()) {
-            return 'Le titre est requis';
-        }
-        if (res?.type === 'livre' && !formValue.auteur.trim()) {
-            return "L'auteur est requis";
-        }
-        if (res?.type === 'revue' && !formValue.volume.trim()) {
-            return 'Le numéro de volume est requis';
-        }
-        if (formValue.caution <= 0) {
-            return 'La caution doit être supérieure à 0';
-        }
-
+        if (!formValue.titre.trim()) return 'Le titre est requis';
+        if (res?.type === 'livre' && !formValue.auteur.trim()) return "L'auteur est requis";
+        if (res?.type === 'revue' && !formValue.volume.trim()) return 'Le numéro de volume est requis';
+        if (formValue.caution <= 0) return 'La caution doit être supérieure à 0';
         return null;
     }
 

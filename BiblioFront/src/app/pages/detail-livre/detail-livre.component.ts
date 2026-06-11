@@ -1,6 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { mockExemplaires } from '../../services/mock-data';
 import { Ressource, Exemplaire, Livre } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
@@ -13,6 +13,11 @@ import { RessourceService } from '../../services/ressource.service';
     templateUrl: './detail-livre.component.html'
 })
 export class DetailLivreComponent implements OnInit {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly ressourceService = inject(RessourceService);
+    private readonly notificationService = inject(NotificationService);
+
     ressource = signal<Ressource | null>(null);
     exemplaires = signal<Exemplaire[]>([]);
     isLoading = signal(true);
@@ -21,13 +26,6 @@ export class DetailLivreComponent implements OnInit {
     dispoCount = (): number => {
         return this.exemplaires().filter(e => e.disponible).length;
     };
-
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private ressourceService: RessourceService,
-        private notificationService: NotificationService
-    ) { }
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
@@ -39,25 +37,21 @@ export class DetailLivreComponent implements OnInit {
     }
 
     getIsbnOrNA(): string {
-        if (!this.ressource()) return 'N/A';
-        const res = this.ressource()!;
+        const res = this.ressource();
+        if (!res) return 'N/A';
         if (this.isLivre(res)) {
-            // Access directly via indexing to avoid type issues
-            const codeISBN = (res as any)['codeISBN'];
-            return codeISBN || 'N/A';
+            return (res as Livre).codeISBN || 'N/A';
         }
         return 'N/A';
     }
 
     getAuthorOrVolume(): string {
-        if (!this.ressource()) return '';
-        const res = this.ressource()!;
+        const res = this.ressource();
+        if (!res) return '';
         if (this.isLivre(res)) {
-            const livre = this.ressource() as Livre;
-            return livre.auteur;
+            return (res as Livre).auteur;
         }
-        const revue = this.ressource() as { numeroVolume: number };
-        return `Volume ${revue.numeroVolume}`;
+        return `Volume ${(res as { numeroVolume: number }).numeroVolume}`;
     }
 
     isLivre(ressource: Ressource): boolean {
@@ -74,7 +68,7 @@ export class DetailLivreComponent implements OnInit {
                 );
                 this.isLoading.set(false);
             },
-            error: (err) => {
+            error: (err: Error) => {
                 console.error('Erreur lors du chargement de la ressource', err);
                 this.isLoading.set(false);
             }

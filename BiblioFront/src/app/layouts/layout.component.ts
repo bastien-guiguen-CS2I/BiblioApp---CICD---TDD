@@ -1,10 +1,9 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { DialogService } from '../services/dialog.service';
-import { Utilisateur } from '../models/models';
 
 @Component({
     selector: 'app-layout',
@@ -13,16 +12,13 @@ import { Utilisateur } from '../models/models';
     templateUrl: './layout.component.html'
 })
 export class LayoutComponent {
+    private readonly authService = inject(AuthService);
+    private readonly notificationService = inject(NotificationService);
+    private readonly dialogService = inject(DialogService);
+
     isMobileMenuOpen = signal(false);
     currentUser = computed(() => this.authService.currentUser());
     isAdmin = computed(() => this.authService.isAdmin());
-
-    constructor(
-        private router: Router,
-        private authService: AuthService,
-        private notificationService: NotificationService,
-        private dialogService: DialogService
-    ) { }
 
     toggleMobileMenu(): void {
         this.isMobileMenuOpen.update(v => !v);
@@ -51,4 +47,3 @@ export class LayoutComponent {
         return new Date();
     }
 }
-

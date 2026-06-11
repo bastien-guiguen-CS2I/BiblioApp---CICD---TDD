@@ -1,11 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { mockEmprunts, mockExemplaires, mockRessources } from '../../services/mock-data';
-import { Emprunt } from '../../models/models';
+import { Emprunt, Utilisateur } from '../../models/models';
 import { NotificationService } from '../../services/notification.service';
 import { UtilisateurService } from '../../services/utilisateur.service';
-import { Utilisateur } from '../../models/models';
 
 @Component({
     selector: 'app-gestion-emprunts',
@@ -14,17 +13,15 @@ import { Utilisateur } from '../../models/models';
     templateUrl: './gestion-emprunts.component.html'
 })
 export class GestionEmpruntsComponent implements OnInit {
+    private readonly notificationService = inject(NotificationService);
+    private readonly utilisateurService = inject(UtilisateurService);
+
     emprunts = signal<Emprunt[]>([]);
     utilisateurs = signal<Utilisateur[]>([]);
     search = '';
     activeTab = signal<'tous' | 'retards'>('tous');
     isLoading = signal(true);
     isSending = signal(false);
-
-    constructor(
-        private notificationService: NotificationService,
-        private utilisateurService: UtilisateurService
-    ) { }
 
     ngOnInit(): void {
         this.fetchEmprunts();
@@ -33,19 +30,17 @@ export class GestionEmpruntsComponent implements OnInit {
 
     filteredEmprunts = (): Emprunt[] => {
         let filtered = this.emprunts();
-
         if (this.activeTab() === 'retards') {
             filtered = filtered.filter(e => !e.dateRetourEffective && e.enRetard);
         }
-
         const searchLower = this.search.toLowerCase();
         return filtered.filter(e => {
             const user = this.getUtilisateur(e.utilisateurId);
             const resource = this.getRessource(e.exemplaireId);
             return (
-                (user?.nom.toLowerCase().includes(searchLower)) ||
-                (user?.prenom.toLowerCase().includes(searchLower)) ||
-                (resource?.titre.toLowerCase().includes(searchLower))
+                user?.nom.toLowerCase().includes(searchLower) ||
+                user?.prenom.toLowerCase().includes(searchLower) ||
+                resource?.titre.toLowerCase().includes(searchLower)
             );
         });
     };
@@ -60,7 +55,7 @@ export class GestionEmpruntsComponent implements OnInit {
         return this.emprunts().filter(e => !e.dateRetourEffective && e.enRetard).length;
     }
 
-    getUtilisateur(userId: string) {
+    getUtilisateur(userId: string): Utilisateur | undefined {
         return this.utilisateurs().find(u => u.id === userId);
     }
 

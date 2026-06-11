@@ -2,7 +2,7 @@ name: Build Frontend
 
 on:
   workflow_call:
-
+    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,11 +22,16 @@ jobs:
           cd BiblioFront
           npm ci
 
+      - name: Lint
+        run: |
+          cd BiblioFront
+          npm run lint
+
       - name: Build
         run: |
           cd BiblioFront
           npm run build
-
+          
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -28,6 +28,11 @@ interface ModifyUserForm {
     templateUrl: './modification-utilisateur.component.html'
 })
 export class ModificationUtilisateurComponent implements OnInit {
+    private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
+    private readonly notificationService = inject(NotificationService);
+    private readonly utilisateurService = inject(UtilisateurService);
+
     userId = signal<string>('');
     user = signal<Utilisateur | null>(null);
     compte = signal<{ solde: number } | null>(null);
@@ -49,13 +54,6 @@ export class ModificationUtilisateurComponent implements OnInit {
 
     isSubmitting = signal(false);
     isLoading = signal(true);
-
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private notificationService: NotificationService,
-        private utilisateurService: UtilisateurService
-    ) { }
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
@@ -119,14 +117,8 @@ export class ModificationUtilisateurComponent implements OnInit {
 
     private validateForm(): string | null {
         const formValue = this.form();
-
-        if (!formValue.nom.trim() || !formValue.prenom.trim()) {
-            return 'Le nom et le prénom sont requis';
-        }
-        if (!formValue.email.trim()) {
-            return "L'email est requis";
-        }
-
+        if (!formValue.nom.trim() || !formValue.prenom.trim()) return 'Le nom et le prénom sont requis';
+        if (!formValue.email.trim()) return "L'email est requis";
         return null;
     }
 
@@ -146,7 +138,7 @@ export class ModificationUtilisateurComponent implements OnInit {
         this.isSubmitting.set(true);
         const formValue = this.form();
 
-        this.utilisateurService.updateUtilisateur(u.id, {
+        const updatedUser: Utilisateur = {
             ...u,
             nom: formValue.nom,
             prenom: formValue.prenom,
@@ -154,7 +146,9 @@ export class ModificationUtilisateurComponent implements OnInit {
             telephone: formValue.telephone,
             adresse: formValue.adresse,
             compte: { soldeDisponible: formValue.soldeDisponible }
-        } as any).subscribe({
+        } as Utilisateur;
+
+        this.utilisateurService.updateUtilisateur(u.id, updatedUser).subscribe({
             next: () => {
                 this.isSubmitting.set(false);
                 this.notificationService.success("L'utilisateur a été modifié avec succès");
