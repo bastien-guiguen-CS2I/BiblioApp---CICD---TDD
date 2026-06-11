@@ -1,10 +1,11 @@
-﻿# BiblioApp Documentation
+﻿# BiblioApp
 
-Documentation technique du projet BiblioApp (Backend Spring Boot + Frontend Angular).
+Application de gestion de bibliothèque - Spring Boot + Angular, conteneurisée avec Docker, déployée via GitHub Actions.
 
 ## Sections
-- Architecture
-- Backend
-- Frontend
-- CI/CD
-- Development
+
+- [Architecture](architecture/overview.md)
+- [Backend](backend/setup.md)
+- [Frontend](frontend/setup.md)
+- [CI/CD](cicd/workflows.md)
+- [Développement](development/conventions.md)

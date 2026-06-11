@@ -1,42 +1,33 @@
-﻿# Backend Setup
+﻿# Backend - Setup
 
-Ce guide explique comment préparer l'environnement et lancer le backend localement.
+## Prérequis
 
-**Prérequis**
-- **JDK 21** : installez OpenJDK 21 ou une distribution équivalente. Vérifier avec `java -version` (doit afficher `21` ou plus).
-- **Maven** : non requis globalement — le projet contient le *Maven Wrapper* (`mvnw` / `mvnw.cmd`).
-- **Git** (optionnel) : pour cloner le dépôt.
+| Outil | Version |
+|-------|---------|
+| JDK | 21 |
+| Maven | via wrapper - aucune installation globale requise |
 
-**1) Cloner et se positionner**
-
-```bash
-git clone <url-du-repo>
-cd "BiblioApp - CICD - TDD"/BiblioBack
-```
-
-Sur Windows utilisez `mvnw.cmd`, sur macOS / Linux utilisez `./mvnw`.
-
-**2) Exécuter les tests**
+## Lancer en local
 
 ```bash
-# Windows
-.\mvnw.cmd test
+cd BiblioBack
 
-# macOS / Linux
-./mvnw test
+./mvnw spring-boot:run        # macOS / Linux
+.\mvnw.cmd spring-boot:run    # Windows
 ```
 
-**3) Lancer l'application en mode développement**
+API disponible sur `http://localhost:8080`.
+
+## Tests
 
 ```bash
-# Windows
-.\mvnw.cmd spring-boot:run
-
-# macOS / Linux
-./mvnw spring-boot:run
+./mvnw test        # macOS / Linux
+.\mvnw.cmd test    # Windows
 ```
 
-L'application démarre par défaut sur `http://localhost:8080`.
+Les tests sont dans `BiblioBack/src/test/java`.
 
-**4) Swagger**
-- Swagger UI : `http://localhost:8080/swagger-ui/index.html`
+## Swagger
+
+- Swagger UI : http://localhost:8080/swagger-ui/index.html
+- OpenAPI JSON : http://localhost:8080/v3/api-docs
