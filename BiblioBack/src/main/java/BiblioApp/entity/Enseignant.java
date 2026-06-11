@@ -8,25 +8,25 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("ENSEIGNANT")
 public class Enseignant extends Utilisateur {
 
-    @Column(nullable = true)
-    private String nomDepartement;
+  @Column(nullable = true)
+  private String nomDepartement;
 
-    @Column(nullable = true)
-    private String grade;
+  @Column(nullable = true)
+  private String grade;
 
-    public String getNomDepartement() {
-        return nomDepartement;
-    }
+  public String getNomDepartement() {
+    return nomDepartement;
+  }
 
-    public void setNomDepartement(String nomDepartement) {
-        this.nomDepartement = nomDepartement;
-    }
+  public void setNomDepartement(String nomDepartement) {
+    this.nomDepartement = nomDepartement;
+  }
 
-    public String getGrade() {
-        return grade;
-    }
+  public String getGrade() {
+    return grade;
+  }
 
-    public void setGrade(String grade) {
-        this.grade = grade;
-    }
+  public void setGrade(String grade) {
+    this.grade = grade;
+  }
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 @EntityScan(basePackages = "BiblioApp.entity")
 public class BiblioBackApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BiblioBackApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(BiblioBackApplication.class, args);
+  }
 }

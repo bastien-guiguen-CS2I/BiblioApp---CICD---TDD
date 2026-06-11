@@ -8,14 +8,14 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("BIBLIOTHECAIRE")
 public class Bibliothecaire extends Utilisateur {
 
-    @Column(nullable = true)
-    private String numeroEmploye;
+  @Column(nullable = true)
+  private String numeroEmploye;
 
-    public String getNumeroEmploye() {
-        return numeroEmploye;
-    }
+  public String getNumeroEmploye() {
+    return numeroEmploye;
+  }
 
-    public void setNumeroEmploye(String numeroEmploye) {
-        this.numeroEmploye = numeroEmploye;
-    }
+  public void setNumeroEmploye(String numeroEmploye) {
+    this.numeroEmploye = numeroEmploye;
+  }
 }

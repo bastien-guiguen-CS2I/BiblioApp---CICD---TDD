@@ -8,7 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -17,8 +18,31 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Grant execute permission to Maven Wrapper
+        run: chmod +x BiblioBack/mvnw
+
+      - name: Check code formatting
+        run: |
+          cd BiblioBack
+          ./mvnw spotless:check
+
+      - name: Run PMD analysis
+        run: |
+          cd BiblioBack
+          ./mvnw pmd:check
+
+      # faire une suppression ciblée SpotBugs + justification
+      # - name: Run SpotBugs analysis
+      #   run: |
+      #     cd BiblioBack
+      #     ./mvnw spotbugs:check
+
       - name: Run tests
         run: |
           cd BiblioBack
-          chmod +x ./mvnw
           ./mvnw test -B
+
+      - name: Package application
+        run: |
+          cd BiblioBack
+          ./mvnw package -DskipTests

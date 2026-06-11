@@ -9,23 +9,28 @@ import java.time.LocalDate;
 @DiscriminatorValue("REVUE")
 public class Revue extends Ressource {
 
-    @Column(nullable = true)
-    private Integer numeroVolume;
+  @Column(nullable = true)
+  private Integer numeroVolume;
 
-    public Revue() {
-    }
+  public Revue() {}
 
-    public Revue(String titre, String type, Integer emplacementId, Integer caution, String localisation,
-            LocalDate datePublication, Integer numeroVolume) {
-        super(titre, type, emplacementId, caution, localisation, datePublication);
-        this.numeroVolume = numeroVolume;
-    }
+  public Revue(
+      String titre,
+      String type,
+      Integer emplacementId,
+      Integer caution,
+      String localisation,
+      LocalDate datePublication,
+      Integer numeroVolume) {
+    super(titre, type, emplacementId, caution, localisation, datePublication);
+    this.numeroVolume = numeroVolume;
+  }
 
-    public Integer getNumeroVolume() {
-        return numeroVolume;
-    }
+  public Integer getNumeroVolume() {
+    return numeroVolume;
+  }
 
-    public void setNumeroVolume(Integer numeroVolume) {
-        this.numeroVolume = numeroVolume;
-    }
+  public void setNumeroVolume(Integer numeroVolume) {
+    this.numeroVolume = numeroVolume;
+  }
 }

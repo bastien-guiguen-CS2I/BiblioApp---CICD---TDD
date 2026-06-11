@@ -9,94 +9,98 @@ import java.time.LocalDate;
 @DiscriminatorColumn(name = "type_ressource", discriminatorType = DiscriminatorType.STRING)
 public abstract class Ressource {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    @Column(nullable = false)
-    private String titre;
+  @Column(nullable = false)
+  private String titre;
 
-    @Column(nullable = false)
-    private String type;
+  @Column(nullable = false)
+  private String type;
 
-    @Column(nullable = false)
-    private Integer emplacementId;
+  @Column(nullable = false)
+  private Integer emplacementId;
 
-    @Column(nullable = false)
-    private Integer caution;
+  @Column(nullable = false)
+  private Integer caution;
 
-    @Column(nullable = true)
-    private String localisation;
+  @Column(nullable = true)
+  private String localisation;
 
-    @Column(nullable = true)
-    private LocalDate datePublication;
+  @Column(nullable = true)
+  private LocalDate datePublication;
 
-    public Ressource() {
-    }
+  public Ressource() {}
 
-    public Ressource(String titre, String type, Integer emplacementId, Integer caution, String localisation,
-            LocalDate datePublication) {
-        this.titre = titre;
-        this.type = type;
-        this.emplacementId = emplacementId;
-        this.caution = caution;
-        this.localisation = localisation;
-        this.datePublication = datePublication;
-    }
+  public Ressource(
+      String titre,
+      String type,
+      Integer emplacementId,
+      Integer caution,
+      String localisation,
+      LocalDate datePublication) {
+    this.titre = titre;
+    this.type = type;
+    this.emplacementId = emplacementId;
+    this.caution = caution;
+    this.localisation = localisation;
+    this.datePublication = datePublication;
+  }
 
-    public Integer getId() {
-        return id;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public String getTitre() {
-        return titre;
-    }
+  public String getTitre() {
+    return titre;
+  }
 
-    public void setTitre(String titre) {
-        this.titre = titre;
-    }
+  public void setTitre(String titre) {
+    this.titre = titre;
+  }
 
-    public String getType() {
-        return type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
 
-    public Integer getEmplacementId() {
-        return emplacementId;
-    }
+  public Integer getEmplacementId() {
+    return emplacementId;
+  }
 
-    public void setEmplacementId(Integer emplacementId) {
-        this.emplacementId = emplacementId;
-    }
+  public void setEmplacementId(Integer emplacementId) {
+    this.emplacementId = emplacementId;
+  }
 
-    public Integer getCaution() {
-        return caution;
-    }
+  public Integer getCaution() {
+    return caution;
+  }
 
-    public void setCaution(Integer caution) {
-        this.caution = caution;
-    }
+  public void setCaution(Integer caution) {
+    this.caution = caution;
+  }
 
-    public String getLocalisation() {
-        return localisation;
-    }
+  public String getLocalisation() {
+    return localisation;
+  }
 
-    public void setLocalisation(String localisation) {
-        this.localisation = localisation;
-    }
+  public void setLocalisation(String localisation) {
+    this.localisation = localisation;
+  }
 
-    public LocalDate getDatePublication() {
-        return datePublication;
-    }
+  public LocalDate getDatePublication() {
+    return datePublication;
+  }
 
-    public void setDatePublication(LocalDate datePublication) {
-        this.datePublication = datePublication;
-    }
+  public void setDatePublication(LocalDate datePublication) {
+    this.datePublication = datePublication;
+  }
 }

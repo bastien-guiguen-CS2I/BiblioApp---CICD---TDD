@@ -8,14 +8,14 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("PARTICULIER")
 public class Particulier extends Utilisateur {
 
-    @Column(nullable = true)
-    private String profession;
+  @Column(nullable = true)
+  private String profession;
 
-    public String getProfession() {
-        return profession;
-    }
+  public String getProfession() {
+    return profession;
+  }
 
-    public void setProfession(String profession) {
-        this.profession = profession;
-    }
+  public void setProfession(String profession) {
+    this.profession = profession;
+  }
 }
