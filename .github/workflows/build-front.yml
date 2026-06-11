@@ -22,6 +22,11 @@ jobs:
           cd BiblioFront
           npm ci
 
+      - name: Audit
+        run: |
+          cd BiblioFront
+          npm audit --audit-level=critical
+
       - name: Lint
         run: |
           cd BiblioFront
@@ -31,7 +36,7 @@ jobs:
         run: |
           cd BiblioFront
           npm run build
-          
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
