@@ -1,10 +1,13 @@
 name: Documentation
+
 on:
   workflow_call:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 jobs:
   deploy:
     environment:
@@ -18,9 +21,9 @@ jobs:
         with:
           python-version: "3.x"
       - run: pip install zensical
-      - run: zensical build --clean
+      - run: cd docs && zensical build --clean
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: docs/site
       - uses: actions/deploy-pages@v4
         id: deployment

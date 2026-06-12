@@ -6,6 +6,8 @@
 
 [project]
 site_name = "BiblioApp - CICD - TDD Documentation"
+docs_dir = "."
+site_dir = "site"
 site_description = "Documentation for BiblioApp - Component Integrated Continuous Development with TDD"
 site_author = "BiblioApp Team"
 site_url = "https://zensical.org/biblio-app"
