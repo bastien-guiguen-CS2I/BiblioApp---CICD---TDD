@@ -11,11 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     registry
         .addMapping("/**")
-        .allowedOriginPatterns(
-            "http://localhost:4200",
-            "http://localhost:5173",
-            "http://localhost:8081",
-            "http://localhost:8082")
+        .allowedOriginPatterns("*")
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("*")
         .allowCredentials(false);
