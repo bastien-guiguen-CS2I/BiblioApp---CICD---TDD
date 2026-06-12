@@ -27,6 +27,22 @@ jobs:
           cd BiblioFront
           npm audit --audit-level=critical
 
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.71.0_Linux-64bit.tar.gz
+          tar zxvf trivy_0.71.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+
+      - name: Run Trivy scan
+        run: |
+          cd BiblioFront
+          trivy fs . \
+            --scanners vuln,secret \
+            --severity HIGH,CRITICAL \
+            --exit-code 1
+
       - name: Lint
         run: |
           cd BiblioFront

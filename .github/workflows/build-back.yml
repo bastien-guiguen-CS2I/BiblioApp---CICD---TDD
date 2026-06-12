@@ -18,24 +18,21 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}
+
       - name: Grant execute permission to Maven Wrapper
         run: chmod +x BiblioBack/mvnw
 
-      - name: Check code formatting
+      - name: Warm Maven dependencies cache
         run: |
           cd BiblioBack
-          ./mvnw spotless:check
-
-      - name: Run PMD analysis
-        run: |
-          cd BiblioBack
-          ./mvnw pmd:check
-
-      # faire une suppression ciblée SpotBugs + justification
-      # - name: Run SpotBugs analysis
-      #   run: |
-      #     cd BiblioBack
-      #     ./mvnw spotbugs:check
+          ./mvnw -q dependency:go-offline
 
       - name: Run tests
         run: |
@@ -46,3 +43,29 @@ jobs:
         run: |
           cd BiblioBack
           ./mvnw package -DskipTests
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.71.0_Linux-64bit.tar.gz
+          tar zxvf trivy_0.71.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+
+      - name: Run Trivy scan
+        run: |
+          cd BiblioBack
+          trivy fs . \
+            --scanners vuln,secret,misconfig \
+            --severity HIGH,CRITICAL \
+            --exit-code 1
+
+      - name: Check code formatting
+        run: |
+          cd BiblioBack
+          ./mvnw spotless:check
+
+      - name: Run PMD analysis
+        run: |
+          cd BiblioBack
+          ./mvnw pmd:check
