@@ -28,10 +28,9 @@ jobs:
           SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
 
-          # Tag sémantique si le déclencheur est un tag Git (ex: refs/tags/v1.2.3)
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            SEMVER="${{ github.ref_name }}"          # ex: v1.2.3
-            SEMVER_CLEAN="${SEMVER#v}"               # ex: 1.2.3
+            SEMVER="${{ github.ref_name }}"
+            SEMVER_CLEAN="${SEMVER#v}"
             MAJOR=$(echo "$SEMVER_CLEAN" | cut -d. -f1)
             MINOR=$(echo "$SEMVER_CLEAN" | cut -d. -f1,2)
             echo "semver=${SEMVER_CLEAN}" >> $GITHUB_OUTPUT
@@ -80,6 +79,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./BiblioBack
+          file: ./docker/back/Dockerfile
           push: ${{ inputs.push_image }}
           tags: ${{ steps.build_tags.outputs.back }}
           cache-from: type=gha
@@ -89,6 +89,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./BiblioFront
+          file: ./docker/front/Dockerfile
           push: ${{ inputs.push_image }}
           tags: ${{ steps.build_tags.outputs.front }}
           cache-from: type=gha
@@ -107,7 +108,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docs/Dockerfile
+          file: ./docker/docs/Dockerfile
           push: ${{ inputs.push_image }}
           tags: ${{ steps.build_tags.outputs.docs }}
           cache-from: type=gha
