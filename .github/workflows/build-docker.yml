@@ -2,6 +2,11 @@ name: Build & Push Docker Images
 
 on:
   workflow_call:
+    inputs:
+      push_image:
+        description: 'Whether to push images to GHCR'
+        required: true
+        type: boolean
 
 jobs:
   docker:
@@ -17,32 +22,110 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Compute image tags
+        id: tags
+        run: |
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "sha_short=${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+          # Tag sémantique si le déclencheur est un tag Git (ex: refs/tags/v1.2.3)
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            SEMVER="${{ github.ref_name }}"          # ex: v1.2.3
+            SEMVER_CLEAN="${SEMVER#v}"               # ex: 1.2.3
+            MAJOR=$(echo "$SEMVER_CLEAN" | cut -d. -f1)
+            MINOR=$(echo "$SEMVER_CLEAN" | cut -d. -f1,2)
+            echo "semver=${SEMVER_CLEAN}" >> $GITHUB_OUTPUT
+            echo "semver_major=${MAJOR}"  >> $GITHUB_OUTPUT
+            echo "semver_minor=${MINOR}"  >> $GITHUB_OUTPUT
+            echo "is_tag=true"           >> $GITHUB_OUTPUT
+          else
+            echo "is_tag=false"          >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
+        if: inputs.push_image
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & Push Back
+      - name: Build tags list
+        id: build_tags
         run: |
-          docker build -t $REGISTRY/back:latest ./BiblioBack
-          docker push $REGISTRY/back:latest
+          build_tag_list() {
+            local image="$1"
+            local tags="${REGISTRY}/${image}:sha-${{ steps.tags.outputs.sha_short }}"
+            if [[ "${{ inputs.push_image }}" == "true" ]]; then
+              if [[ "${{ steps.tags.outputs.is_tag }}" == "true" ]]; then
+                tags="${tags},${REGISTRY}/${image}:${{ steps.tags.outputs.semver }}"
+                tags="${tags},${REGISTRY}/${image}:${{ steps.tags.outputs.semver_minor }}"
+                tags="${tags},${REGISTRY}/${image}:${{ steps.tags.outputs.semver_major }}"
+                tags="${tags},${REGISTRY}/${image}:latest"
+              elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+                tags="${tags},${REGISTRY}/${image}:latest"
+              fi
+            fi
+            echo "$tags"
+          }
+          echo "back=$(build_tag_list back)"       >> $GITHUB_OUTPUT
+          echo "front=$(build_tag_list front)"     >> $GITHUB_OUTPUT
+          echo "swagger=$(build_tag_list swagger)" >> $GITHUB_OUTPUT
+          echo "docs=$(build_tag_list docs)"       >> $GITHUB_OUTPUT
+
+      - name: Build & Push Back
+        uses: docker/build-push-action@v5
+        with:
+          context: ./BiblioBack
+          push: ${{ inputs.push_image }}
+          tags: ${{ steps.build_tags.outputs.back }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build & Push Front
-        run: |
-          docker build -t $REGISTRY/front:latest ./BiblioFront
-          docker push $REGISTRY/front:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: ./BiblioFront
+          push: ${{ inputs.push_image }}
+          tags: ${{ steps.build_tags.outputs.front }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build & Push Swagger
-        run: |
-          docker build -t $REGISTRY/swagger:latest ./docker/swagger
-          docker push $REGISTRY/swagger:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/swagger
+          push: ${{ inputs.push_image }}
+          tags: ${{ steps.build_tags.outputs.swagger }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build & Push Docs
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docs/Dockerfile
+          push: ${{ inputs.push_image }}
+          tags: ${{ steps.build_tags.outputs.docs }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Job summary
         run: |
-          docker build -f docs/Dockerfile -t $REGISTRY/docs:latest .
-          docker push $REGISTRY/docs:latest
+          echo "## Docker build summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Image   | Tags |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| back    | \`${{ steps.build_tags.outputs.back }}\` |"    >> $GITHUB_STEP_SUMMARY
+          echo "| front   | \`${{ steps.build_tags.outputs.front }}\` |"   >> $GITHUB_STEP_SUMMARY
+          echo "| swagger | \`${{ steps.build_tags.outputs.swagger }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| docs    | \`${{ steps.build_tags.outputs.docs }}\` |"    >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ inputs.push_image }}" == "true" ]]; then
+            echo "Images **pushées** sur GHCR" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Build uniquement (pas de push — branche non-main / PR)" >> $GITHUB_STEP_SUMMARY
+          fi

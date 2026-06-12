@@ -3,13 +3,14 @@ name: CI
 on:
   push:
     branches:
-      - main
-      - develop
+      - '**'
     paths:
       - 'BiblioBack/**'
       - 'BiblioFront/**'
       - 'docs/**'
       - '.github/workflows/**'
+    tags:
+      - 'v*.*.*'
 
   pull_request:
     branches:
@@ -35,8 +36,14 @@ jobs:
     uses: ./.github/workflows/build-front.yml
 
   docs:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docs.yml
 
   docker:
+    needs: [backend, frontend]
     uses: ./.github/workflows/build-docker.yml
+    with:
+      push_image: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
+    permissions:
+      contents: read
+      packages: write
