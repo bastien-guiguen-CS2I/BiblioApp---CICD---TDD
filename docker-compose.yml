@@ -2,7 +2,7 @@ services:
   back:
     build:
       context: ./BiblioBack
-      dockerfile: Dockerfile
+      dockerfile: ../docker/back/Dockerfile
     image: biblioapp-back:local
     container_name: biblio-back
     ports:
@@ -28,7 +28,7 @@ services:
   front:
     build:
       context: ./BiblioFront
-      dockerfile: Dockerfile
+      dockerfile: ../docker/front/Dockerfile
     image: biblioapp-front:local
     container_name: biblio-front
     depends_on:
@@ -41,7 +41,7 @@ services:
   docs:
     build:
       context: .
-      dockerfile: docs/Dockerfile
+      dockerfile: docker/docs/Dockerfile
     image: biblioapp-docs:local
     container_name: biblio-docs
     ports:
