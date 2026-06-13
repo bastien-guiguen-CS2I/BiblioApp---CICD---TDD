@@ -1,19 +1,22 @@
-﻿# CI/CD - Workflows
+# CI/CD - Pipelines
 
 ## Pipeline principal
 
-Fichier : `.github/workflows/ci.yml`
+**Fichier :** `.github/workflows/ci.yml`  
+**Déclenché :** à chaque push sur `main`
 
-Déclenché à chaque push sur `main`. Orchestre :
+Le pipeline orchestre dans l'ordre :
 
-- Build et tests backend (Maven)
-- Build et tests frontend (npm)
-- Build et publication des images Docker sur GHCR
-- Build de la documentation MkDocs
+1. Build et tests backend (Maven)
+2. Build et tests frontend (npm)
+3. Build et publication des images Docker sur GHCR
+4. Build de la documentation MkDocs
 
-La validation Docker peut aussi être lancée séparément via `.github/workflows/build-docker.yml`.
+La validation Docker peut aussi être lancée indépendamment via `.github/workflows/build-docker.yml`.
 
-## Images publiées (GHCR)
+---
+
+## Images Docker publiées (GHCR)
 
 ```
 ghcr.io/bastien-guiguen-cs2i/biblioapp/back:latest
@@ -22,12 +25,14 @@ ghcr.io/bastien-guiguen-cs2i/biblioapp/swagger:latest
 ghcr.io/bastien-guiguen-cs2i/biblioapp/docs:latest
 ```
 
-## Démarrage local rapide
+---
+
+## Démarrage local
 
 ```bash
 # Build depuis les sources
 make up
 
-# Depuis les images GHCR (aucun build)
+# Depuis les images GHCR (aucun build local)
 make prod-up
 ```

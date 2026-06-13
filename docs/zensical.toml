@@ -46,3 +46,18 @@ toggle.name = "Switch to light mode"
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/bastien-guiguen-CS2I/BiblioApp"
+
+[[project.nav]]
+Home = "index.md"
+
+[[project.nav]]
+"Vue d'ensemble" = ["overview/architecture.md"]
+
+[[project.nav]]
+Backend = ["backend/stack.md", "backend/api.md", "backend/tests.md"]
+
+[[project.nav]]
+Frontend = ["frontend/stack.md"]
+
+[[project.nav]]
+"CI/CD & Développement" = ["cicd/workflows.md", "cicd/versioning.md", "cicd/conventions.md"]

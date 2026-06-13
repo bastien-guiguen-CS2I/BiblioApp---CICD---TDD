@@ -1,18 +1,21 @@
-# Frontend - Stack
+# Frontend - Stack & Structure
+
+## Stack
 
 | Technologie | Version | Rôle |
 |-------------|---------|------|
 | Angular | 21.2 | Framework SPA |
 | TypeScript | 5.9 | Langage |
 | RxJS | 7.8 | Gestion des flux asynchrones |
-| TailwindCSS | 3.4 | Styles utilitaires |
-| Angular ESLint | 21.4 | Linting TypeScript + templates |
+| TailwindCSS | 3.4 | Styles utilitaires (utility-first CSS) |
+| Angular ESLint | 21.4 | Linting TypeScript + templates Angular |
 | Vitest | 4.x | Tests unitaires |
 | Node.js | 22.x | Runtime requis |
 | npm | 11.x | Gestionnaire de paquets |
 
 ## Dépendances (`package.json`)
 
+**Production :**
 ```json
 "dependencies": {
   "@angular/common":           "^21.2.0",
@@ -26,6 +29,7 @@
 }
 ```
 
+**Développement :**
 ```json
 "devDependencies": {
   "@angular/build":     "^21.2.0",
@@ -57,4 +61,27 @@ BiblioFront/src/app/
 │   └── notification.service.ts
 └── models/
     └── models.ts
+```
+
+## Lancer en local
+
+**Prérequis :** Node.js 22.x et npm 11.x
+
+```bash
+cd BiblioFront
+npm install
+npm start
+```
+
+App disponible sur `http://localhost:4200`.
+
+Le fichier `proxy.conf.json` redirige automatiquement toutes les requêtes `/api/*` vers `http://localhost:8080`. Le backend doit tourner en parallèle.
+
+## Commandes disponibles
+
+```bash
+npm start        # Serveur de développement (hot reload)
+npm run build    # Build de production
+npm run lint     # ESLint (TypeScript + templates)
+npm test         # Tests unitaires via Vitest
 ```
